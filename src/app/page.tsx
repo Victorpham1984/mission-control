@@ -196,6 +196,9 @@ export default function Home() {
         </div>
 
         <div className="ml-auto flex gap-1 md:gap-2">
+          <button onClick={() => setShowChat(true)} className="px-2 md:px-3.5 py-1.5 md:py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-xs md:text-sm hover:bg-[var(--card-hover)] transition" title="Squad Chat">
+            💬 <span className="hidden sm:inline">Chat</span>
+          </button>
           <button onClick={() => setShowBroadcast(true)} className="px-2 md:px-3.5 py-1.5 md:py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-xs md:text-sm hover:bg-[var(--card-hover)] transition" title="Broadcast">
             📢 <span className="hidden md:inline">Broadcast</span>
           </button>
