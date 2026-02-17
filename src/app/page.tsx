@@ -200,8 +200,8 @@ export default function Home() {
           <button onClick={() => setShowBroadcast(true)} className="px-2 md:px-3.5 py-1.5 md:py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-xs md:text-sm hover:bg-[var(--card-hover)] transition" title="Broadcast">
             📢 <span className="hidden md:inline">Broadcast</span>
           </button>
-          <button className="hidden lg:block px-3.5 py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm hover:bg-[var(--card-hover)] transition" title="Docs">
-            📄 Docs
+          <button onClick={() => router.push("/docs")} className="px-2 md:px-3.5 py-1.5 md:py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-xs md:text-sm hover:bg-[var(--card-hover)] transition" title="Docs">
+            📄 <span className="hidden sm:inline">Docs</span>
           </button>
           <button onClick={() => setShowNew(true)} className="px-2 md:px-4 py-1.5 md:py-2 rounded-lg bg-[var(--accent)] text-black text-xs md:text-sm font-semibold hover:brightness-110 transition">
             + <span className="hidden sm:inline">New Task</span>
