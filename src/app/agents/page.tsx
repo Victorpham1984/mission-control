@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useWorkspaceData } from "@/lib/supabase/hooks";
 import AgentProfileModal from "@/components/AgentProfileModal";
+import Header from "@/components/Header";
 import type { Agent } from "@/lib/data";
 
 const badgeClass: Record<string, string> = { lead: "bg-amber-500 text-black", spc: "bg-purple-500 text-white", int: "bg-blue-500 text-white" };
@@ -11,7 +11,6 @@ const statusDot: Record<string, string> = { working: "bg-green-400 shadow-[0_0_6
 const statusLabel: Record<string, string> = { working: "Working", idle: "Idle", error: "Error" };
 
 export default function AgentsPage() {
-  const router = useRouter();
   const { agents, dbAgents, tasks, loading } = useWorkspaceData();
   const [profileAgent, setProfileAgent] = useState<Agent | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -31,27 +30,7 @@ export default function AgentsPage() {
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
-      {/* Header */}
-      <header className="shrink-0 h-14 md:h-16 bg-[var(--surface)] border-b border-[var(--border)] flex items-center px-3 md:px-6 gap-2 md:gap-6 z-30">
-        <div className="text-base md:text-lg font-bold text-[var(--accent)] flex items-center gap-2 shrink-0">
-          <span className="text-xl md:text-2xl">⚡</span>
-          <span className="hidden sm:inline">CommandMate</span>
-          <span className="sm:hidden">CM</span>
-        </div>
-
-        <nav className="hidden md:flex gap-1 ml-8">
-          <button onClick={() => router.push("/")} className="px-4 py-1.5 rounded-lg text-sm text-[var(--text-dim)] hover:bg-[var(--card)] transition">Dashboard</button>
-          <button className="px-4 py-1.5 rounded-lg text-sm bg-[var(--card)] text-white font-semibold border border-[var(--border)]">Agents</button>
-          <button onClick={() => router.push("/settings")} className="px-4 py-1.5 rounded-lg text-sm text-[var(--text-dim)] hover:bg-[var(--card)] transition">Settings</button>
-        </nav>
-
-        {/* Mobile nav */}
-        <div className="flex md:hidden gap-1 ml-2">
-          <button onClick={() => router.push("/")} className="px-2 py-1 rounded text-xs text-[var(--text-dim)]">📊</button>
-          <button className="px-2 py-1 rounded text-xs bg-[var(--card)] border border-[var(--border)]">🤖</button>
-          <button onClick={() => router.push("/settings")} className="px-2 py-1 rounded text-xs text-[var(--text-dim)]">⚙️</button>
-        </div>
-      </header>
+      <Header />
 
       {/* Content */}
       <main className="flex-1 overflow-auto p-4 md:p-8">
