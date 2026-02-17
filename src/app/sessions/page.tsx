@@ -170,7 +170,7 @@ export default function SessionsPage() {
                 className="w-full bg-[var(--card)] border border-[var(--border)] rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-[var(--accent)] transition animate-modal"
               />
             )}
-            <div className="flex gap-1">
+            <div className="flex gap-1 overflow-x-auto">
               {["all", "main", "subagent", "cron"].map((t) => (
                 <button
                   key={t}
@@ -253,14 +253,15 @@ export default function SessionsPage() {
                 </div>
                 <button
                   onClick={exportMarkdown}
-                  className="px-3 py-1.5 bg-[var(--card)] border border-[var(--border)] rounded-lg text-xs hover:bg-[var(--card-hover)] transition"
+                  className="px-2 md:px-3 py-1.5 bg-[var(--card)] border border-[var(--border)] rounded-lg text-xs hover:bg-[var(--card-hover)] transition shrink-0"
                 >
-                  📥 Export MD
+                  <span className="md:hidden">📥</span>
+                  <span className="hidden md:inline">📥 Export MD</span>
                 </button>
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 md:space-y-4">
                 {msgLoading ? (
                   <div className="space-y-4">
                     {Array.from({ length: 5 }).map((_, i) => (
@@ -300,7 +301,7 @@ export default function SessionsPage() {
                         )}
                         {msg.tokens && <TokenBadge tokens={msg.tokens} />}
                       </div>
-                      <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl px-4 py-3 text-sm leading-relaxed prose prose-invert prose-sm max-w-none">
+                      <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl px-3 py-2 md:px-4 md:py-3 text-xs md:text-sm leading-relaxed prose prose-invert prose-sm max-w-none">
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
                       </div>
                     </div>

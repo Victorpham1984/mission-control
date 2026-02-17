@@ -16,7 +16,7 @@ function MessageBubble({ msg }: { msg: Message }) {
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-3`}>
       <div
-        className={`max-w-[80%] md:max-w-[65%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+        className={`max-w-[85%] md:max-w-[65%] rounded-2xl px-3 py-2 md:px-4 md:py-2.5 text-xs md:text-sm leading-relaxed ${
           isUser
             ? "bg-[var(--accent)] text-black rounded-br-md"
             : "bg-[var(--card)] text-[var(--text)] rounded-bl-md border border-[var(--border)]"
@@ -223,7 +223,7 @@ export default function LiveChatPage() {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4">
+              <div className="flex-1 overflow-y-auto p-3 md:p-4">
                 {msgLoading ? (
                   <div className="space-y-4">
                     {Array.from({ length: 4 }).map((_, i) => (
@@ -257,7 +257,7 @@ export default function LiveChatPage() {
               </div>
 
               {/* Input */}
-              <div className="p-3 border-t border-[var(--border)] bg-[var(--surface)]">
+              <div className="p-2 md:p-3 border-t border-[var(--border)] bg-[var(--surface)] sticky bottom-0">
                 <div className="flex gap-2 items-end">
                   <textarea
                     ref={inputRef}
@@ -266,14 +266,15 @@ export default function LiveChatPage() {
                     onKeyDown={handleKeyDown}
                     placeholder="Type a message..."
                     rows={1}
-                    className="flex-1 bg-[var(--card)] border border-[var(--border)] rounded-xl px-4 py-2.5 text-sm resize-none focus:outline-none focus:border-[var(--accent)] transition"
+                    className="flex-1 bg-[var(--card)] border border-[var(--border)] rounded-xl px-3 py-2 md:px-4 md:py-2.5 text-xs md:text-sm resize-none focus:outline-none focus:border-[var(--accent)] transition"
                   />
                   <button
                     onClick={handleSend}
                     disabled={!input.trim() || sending}
-                    className="px-4 py-2.5 bg-[var(--accent)] text-black rounded-xl font-medium text-sm hover:brightness-110 transition disabled:opacity-50"
+                    className="px-3 py-2 md:px-4 md:py-2.5 bg-[var(--accent)] text-black rounded-xl font-medium text-xs md:text-sm hover:brightness-110 transition disabled:opacity-50"
                   >
-                    Send
+                    <span className="hidden md:inline">Send</span>
+                    <span className="md:hidden">➤</span>
                   </button>
                 </div>
               </div>

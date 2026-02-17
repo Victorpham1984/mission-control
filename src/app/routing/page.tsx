@@ -180,16 +180,16 @@ export default function RoutingPage() {
   return (
     <div className="h-screen flex flex-col bg-[var(--bg)]">
       <Header />
-      <main className="flex-1 overflow-auto p-4 md:p-6">
-        <div className="max-w-6xl mx-auto space-y-6">
-          <h1 className="text-2xl font-bold">🔀 Multi-Agent Routing</h1>
+      <main className="flex-1 overflow-auto p-3 md:p-6">
+        <div className="max-w-6xl mx-auto space-y-4 md:space-y-6">
+          <h1 className="text-xl md:text-2xl font-bold">🔀 <span className="hidden sm:inline">Multi-Agent </span>Routing</h1>
 
           {/* Tabs */}
           <div className="flex gap-1 bg-[var(--surface)] p-1 rounded-xl border border-[var(--border)] overflow-x-auto">
             {tabs.map(t => (
               <button key={t.key} onClick={() => setTab(t.key)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap ${tab === t.key ? "bg-[var(--card)] text-white border border-[var(--border)]" : "text-[var(--text-dim)] hover:text-white"}`}>
-                {t.emoji} {t.label}
+                className={`px-2.5 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition whitespace-nowrap ${tab === t.key ? "bg-[var(--card)] text-white border border-[var(--border)]" : "text-[var(--text-dim)] hover:text-white"}`}>
+                {t.emoji} <span className="hidden sm:inline">{t.label}</span>
               </button>
             ))}
           </div>
@@ -202,88 +202,126 @@ export default function RoutingPage() {
             <>
               {/* Flow Diagram */}
               {tab === "flow" && (
-                <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6 overflow-x-auto">
-                  <div className="min-w-[600px]">
-                    {/* SVG connectors */}
-                    <div className="relative">
-                      <div className="grid grid-cols-3 gap-8">
-                        {/* Channels Column */}
-                        <div className="space-y-3">
-                          <h3 className="text-xs font-semibold text-[var(--text-dim)] uppercase tracking-wider mb-3">Channels</h3>
-                          {channels.map(c => (
-                            <div key={c.id} className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-3 flex items-center gap-2 relative" id={`ch-${c.id}`}>
-                              <span className="text-lg">{channelIcons[c.type] || channelIcons.default}</span>
-                              <div className="flex-1 min-w-0">
-                                <div className="text-sm font-medium truncate">{c.name}</div>
-                                <div className="text-xs text-[var(--text-dim)]">{c.type}</div>
+                <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-3 md:p-6">
+                  {/* Mobile: vertical stack */}
+                  <div className="md:hidden space-y-4">
+                    <div className="space-y-2">
+                      <h3 className="text-xs font-semibold text-[var(--text-dim)] uppercase tracking-wider">Channels</h3>
+                      {channels.map(c => (
+                        <div key={c.id} className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-3 flex items-center gap-2">
+                          <span className="text-lg">{channelIcons[c.type] || channelIcons.default}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium truncate">{c.name}</div>
+                            <div className="text-xs text-[var(--text-dim)]">{c.type}</div>
+                          </div>
+                          <div className={`w-2.5 h-2.5 rounded-full ${statusColors[c.status]}`} />
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex justify-center text-[var(--accent)] text-lg">↓</div>
+                    <div className="space-y-2">
+                      <h3 className="text-xs font-semibold text-[var(--text-dim)] uppercase tracking-wider">Routing Rules</h3>
+                      {bindings.map((b, i) => (
+                        <div key={i} className="bg-[var(--card)] border border-[var(--accent)]/20 rounded-xl p-3">
+                          <div className="text-xs font-mono text-[var(--accent)]">{b.channelPattern}</div>
+                          <div className="text-xs text-[var(--text-dim)] mt-1">→ {b.agentId}{b.sessionTarget ? ` (${b.sessionTarget})` : ""}</div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex justify-center text-[var(--accent)] text-lg">↓</div>
+                    <div className="space-y-2">
+                      <h3 className="text-xs font-semibold text-[var(--text-dim)] uppercase tracking-wider">Agents</h3>
+                      {agents.map(a => (
+                        <div key={a.id} className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-3 flex items-center gap-2">
+                          <span className="text-lg">🤖</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium truncate">{a.name}</div>
+                            {a.model && <div className="text-xs text-[var(--text-dim)] truncate">{a.model}</div>}
+                          </div>
+                          <div className={`w-2.5 h-2.5 rounded-full ${statusColors[a.status]}`} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Desktop: 3-column with SVG connectors */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <div className="min-w-[600px]">
+                      <div className="relative">
+                        <div className="grid grid-cols-3 gap-8">
+                          {/* Channels Column */}
+                          <div className="space-y-3">
+                            <h3 className="text-xs font-semibold text-[var(--text-dim)] uppercase tracking-wider mb-3">Channels</h3>
+                            {channels.map(c => (
+                              <div key={c.id} className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-3 flex items-center gap-2 relative" id={`ch-${c.id}`}>
+                                <span className="text-lg">{channelIcons[c.type] || channelIcons.default}</span>
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-sm font-medium truncate">{c.name}</div>
+                                  <div className="text-xs text-[var(--text-dim)]">{c.type}</div>
+                                </div>
+                                <div className={`w-2.5 h-2.5 rounded-full ${statusColors[c.status]}`} />
+                                <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-2 h-2 rounded-full bg-[var(--accent)] z-10" />
                               </div>
-                              <div className={`w-2.5 h-2.5 rounded-full ${statusColors[c.status]}`} />
-                              {/* Connector dot right */}
-                              <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-2 h-2 rounded-full bg-[var(--accent)] z-10" />
-                            </div>
-                          ))}
-                        </div>
+                            ))}
+                          </div>
 
-                        {/* Routing Rules Column */}
-                        <div className="space-y-3 flex flex-col justify-center">
-                          <h3 className="text-xs font-semibold text-[var(--text-dim)] uppercase tracking-wider mb-3">Routing Rules</h3>
-                          {bindings.map((b, i) => (
-                            <div key={i} className="bg-[var(--card)] border border-[var(--accent)]/20 rounded-xl p-3 relative">
-                              {/* Connector dots */}
-                              <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-[var(--accent)] z-10" />
-                              <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-2 h-2 rounded-full bg-[var(--accent)] z-10" />
-                              <div className="text-xs font-mono text-[var(--accent)]">{b.channelPattern}</div>
-                              <div className="text-xs text-[var(--text-dim)] mt-1">→ {b.agentId}{b.sessionTarget ? ` (${b.sessionTarget})` : ""}</div>
-                            </div>
-                          ))}
-
-                          {/* Visual connector lines using CSS */}
-                          <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
-                            <defs>
-                              <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
-                                <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--accent)" opacity="0.3" />
-                              </marker>
-                            </defs>
-                          </svg>
-                        </div>
-
-                        {/* Agents Column */}
-                        <div className="space-y-3">
-                          <h3 className="text-xs font-semibold text-[var(--text-dim)] uppercase tracking-wider mb-3">Agents</h3>
-                          {agents.map(a => (
-                            <div key={a.id} className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-3 flex items-center gap-2 relative">
-                              {/* Connector dot left */}
-                              <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-[var(--accent)] z-10" />
-                              <span className="text-lg">🤖</span>
-                              <div className="flex-1 min-w-0">
-                                <div className="text-sm font-medium truncate">{a.name}</div>
-                                {a.model && <div className="text-xs text-[var(--text-dim)] truncate">{a.model}</div>}
+                          {/* Routing Rules Column */}
+                          <div className="space-y-3 flex flex-col justify-center">
+                            <h3 className="text-xs font-semibold text-[var(--text-dim)] uppercase tracking-wider mb-3">Routing Rules</h3>
+                            {bindings.map((b, i) => (
+                              <div key={i} className="bg-[var(--card)] border border-[var(--accent)]/20 rounded-xl p-3 relative">
+                                <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-[var(--accent)] z-10" />
+                                <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-2 h-2 rounded-full bg-[var(--accent)] z-10" />
+                                <div className="text-xs font-mono text-[var(--accent)]">{b.channelPattern}</div>
+                                <div className="text-xs text-[var(--text-dim)] mt-1">→ {b.agentId}{b.sessionTarget ? ` (${b.sessionTarget})` : ""}</div>
                               </div>
-                              <div className={`w-2.5 h-2.5 rounded-full ${statusColors[a.status]}`} />
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+                            ))}
+                            <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
+                              <defs>
+                                <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+                                  <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--accent)" opacity="0.3" />
+                                </marker>
+                              </defs>
+                            </svg>
+                          </div>
 
-                      {/* Horizontal connector lines between columns */}
-                      <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 5 }}>
-                        {channels.map((c, ci) => {
-                          const agentIds = getAgentForChannel(c.id);
-                          return agentIds.map((aId, ai) => {
-                            const agentIdx = agents.findIndex(a => a.id === aId);
-                            if (agentIdx === -1) return null;
-                            const leftY = 40 + ci * 76 + 30;
-                            const rightY = 40 + agentIdx * 76 + 30;
-                            return (
-                              <svg key={`${ci}-${ai}`} className="absolute inset-0 w-full h-full">
-                                <line
-                                  x1="33.3%" y1={leftY} x2="66.6%" y2={rightY}
-                                  stroke="var(--accent)" strokeOpacity="0.15" strokeWidth="2" strokeDasharray="4 4"
-                                />
-                              </svg>
-                            );
-                          });
-                        })}
+                          {/* Agents Column */}
+                          <div className="space-y-3">
+                            <h3 className="text-xs font-semibold text-[var(--text-dim)] uppercase tracking-wider mb-3">Agents</h3>
+                            {agents.map(a => (
+                              <div key={a.id} className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-3 flex items-center gap-2 relative">
+                                <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-[var(--accent)] z-10" />
+                                <span className="text-lg">🤖</span>
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-sm font-medium truncate">{a.name}</div>
+                                  {a.model && <div className="text-xs text-[var(--text-dim)] truncate">{a.model}</div>}
+                                </div>
+                                <div className={`w-2.5 h-2.5 rounded-full ${statusColors[a.status]}`} />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Horizontal connector lines between columns */}
+                        <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 5 }}>
+                          {channels.map((c, ci) => {
+                            const agentIds = getAgentForChannel(c.id);
+                            return agentIds.map((aId, ai) => {
+                              const agentIdx = agents.findIndex(a => a.id === aId);
+                              if (agentIdx === -1) return null;
+                              const leftY = 40 + ci * 76 + 30;
+                              const rightY = 40 + agentIdx * 76 + 30;
+                              return (
+                                <svg key={`${ci}-${ai}`} className="absolute inset-0 w-full h-full">
+                                  <line
+                                    x1="33.3%" y1={leftY} x2="66.6%" y2={rightY}
+                                    stroke="var(--accent)" strokeOpacity="0.15" strokeWidth="2" strokeDasharray="4 4"
+                                  />
+                                </svg>
+                              );
+                            });
+                          })}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -331,40 +369,56 @@ export default function RoutingPage() {
 
               {/* Agent Binding Table */}
               {tab === "bindings" && (
-                <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-[var(--border)] text-[var(--text-dim)]">
-                          <th className="text-left px-4 py-3 font-medium">Channel Pattern</th>
-                          <th className="text-left px-4 py-3 font-medium">Agent ID</th>
-                          <th className="text-left px-4 py-3 font-medium">Session Target</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {bindings.map((b, i) => (
-                          <tr key={i} className="border-b border-[var(--border)] last:border-0 hover:bg-[var(--card)] transition">
-                            <td className="px-4 py-3 font-mono text-[var(--accent)]">{b.channelPattern}</td>
-                            <td className="px-4 py-3 font-mono">{b.agentId}</td>
-                            <td className="px-4 py-3 text-[var(--text-dim)]">{b.sessionTarget || "—"}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                <>
+                  {/* Mobile: card list */}
+                  <div className="md:hidden space-y-2">
+                    {bindings.map((b, i) => (
+                      <div key={i} className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-3 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-mono text-[var(--accent)]">{b.channelPattern}</span>
+                          <span className="text-xs text-[var(--text-dim)]">{b.sessionTarget || "—"}</span>
+                        </div>
+                        <div className="text-xs font-mono">→ {b.agentId}</div>
+                      </div>
+                    ))}
                   </div>
-                </div>
+                  {/* Desktop: table */}
+                  <div className="hidden md:block bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-[var(--border)] text-[var(--text-dim)]">
+                            <th className="text-left px-4 py-3 font-medium">Channel Pattern</th>
+                            <th className="text-left px-4 py-3 font-medium">Agent ID</th>
+                            <th className="text-left px-4 py-3 font-medium">Session Target</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {bindings.map((b, i) => (
+                            <tr key={i} className="border-b border-[var(--border)] last:border-0 hover:bg-[var(--card)] transition">
+                              <td className="px-4 py-3 font-mono text-[var(--accent)]">{b.channelPattern}</td>
+                              <td className="px-4 py-3 font-mono">{b.agentId}</td>
+                              <td className="px-4 py-3 text-[var(--text-dim)]">{b.sessionTarget || "—"}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </>
               )}
 
               {/* Config Preview */}
               {tab === "config" && (
-                <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 space-y-3">
+                <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-3 md:p-5 space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-semibold">Gateway Configuration</h3>
-                    <button onClick={copyConfig} className="text-xs bg-[var(--card)] border border-[var(--border)] px-3 py-1.5 rounded-lg hover:border-[var(--accent)]/30 transition">
-                      📋 Copy
+                    <h3 className="font-semibold text-sm md:text-base">Gateway Configuration</h3>
+                    <button onClick={copyConfig} className="text-xs bg-[var(--card)] border border-[var(--border)] px-2 md:px-3 py-1.5 rounded-lg hover:border-[var(--accent)]/30 transition">
+                      <span className="md:hidden">📋</span>
+                      <span className="hidden md:inline">📋 Copy</span>
                     </button>
                   </div>
-                  <pre className="text-xs bg-[var(--card)] rounded-lg p-4 overflow-auto max-h-96 whitespace-pre-wrap">{rawConfig}</pre>
+                  <pre className="text-xs bg-[var(--card)] rounded-lg p-3 md:p-4 overflow-auto max-h-64 md:max-h-96 whitespace-pre-wrap">{rawConfig}</pre>
                 </div>
               )}
             </>
