@@ -1,58 +1,89 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getStoredUser, setStoredUser, getStoredWorkspace, setStoredWorkspace, mockLogout, type User, type Workspace } from "@/lib/mock-auth";
+import { createClient } from "@/lib/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
 export default function SettingsPage() {
   const router = useRouter();
+  const supabase = createClient();
   const [user, setUser] = useState<User | null>(null);
-  const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [name, setName] = useState("");
   const [wsName, setWsName] = useState("");
   const [gwUrl, setGwUrl] = useState("");
   const [gwToken, setGwToken] = useState("");
+  const [workspaceId, setWorkspaceId] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
-    const u = getStoredUser();
-    if (!u) { router.push("/login"); return; }
-    setUser(u);
-    setName(u.name);
-    const ws = getStoredWorkspace();
-    if (ws) {
-      setWorkspace(ws);
-      setWsName(ws.name);
-      setGwUrl(ws.openclawUrl);
-      setGwToken(ws.openclawToken);
-    }
-  }, [router]);
+    const load = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.push("/login"); return; }
+      setUser(user);
+      setName(user.user_metadata?.full_name || "");
 
-  const handleSaveProfile = () => {
-    if (!user) return;
-    const updated = { ...user, name };
-    setStoredUser(updated);
-    setUser(updated);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-  };
+      // Load workspace
+      const { data: ws } = await supabase
+        .from("workspaces")
+        .select("*")
+        .eq("owner_id", user.id)
+        .limit(1)
+        .single();
 
-  const handleSaveWorkspace = () => {
-    const updated: Workspace = {
-      id: workspace?.id || crypto.randomUUID(),
-      name: wsName,
-      openclawUrl: gwUrl,
-      openclawToken: gwToken,
+      if (ws) {
+        setWorkspaceId(ws.id);
+        setWsName(ws.name || "");
+        setGwUrl(ws.settings?.gateway_url || "");
+        setGwToken(ws.settings?.gateway_token || "");
+      }
     };
-    setStoredWorkspace(updated);
-    setWorkspace(updated);
+    load();
+  }, [router, supabase]);
+
+  const handleSaveProfile = async () => {
+    if (!user) return;
+    await supabase.auth.updateUser({
+      data: { full_name: name },
+    });
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
 
-  const handleDelete = () => {
-    mockLogout();
+  const handleSaveWorkspace = async () => {
+    if (!user) return;
+    const settings = { gateway_url: gwUrl || null, gateway_token: gwToken || null };
+
+    if (workspaceId) {
+      await supabase
+        .from("workspaces")
+        .update({ name: wsName, settings })
+        .eq("id", workspaceId);
+    } else {
+      const { data } = await supabase
+        .from("workspaces")
+        .insert({
+          name: wsName,
+          slug: wsName.toLowerCase().replace(/\s+/g, "-"),
+          owner_id: user.id,
+          settings,
+        })
+        .select()
+        .single();
+      if (data) setWorkspaceId(data.id);
+    }
+
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  const handleDelete = async () => {
+    if (workspaceId) {
+      await supabase.from("workspaces").delete().eq("id", workspaceId);
+    }
+    await supabase.auth.signOut();
     router.push("/login");
+    router.refresh();
   };
 
   if (!user) return null;
@@ -98,7 +129,7 @@ export default function SettingsPage() {
             <div>
               <label className="text-[11px] uppercase tracking-wider text-[var(--text-dim)] block mb-1.5">Email</label>
               <input
-                value={user.email}
+                value={user.email || ""}
                 disabled
                 className="w-full px-3 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm opacity-60 cursor-not-allowed"
               />

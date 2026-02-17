@@ -1,42 +1,61 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getStoredUser, setStoredWorkspace, setOnboarded } from "@/lib/mock-auth";
+import { createClient } from "@/lib/supabase/client";
 
 const steps = ["Welcome", "Workspace", "Connect", "Done"];
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const supabase = createClient();
   const [step, setStep] = useState(0);
   const [wsName, setWsName] = useState("");
   const [gatewayUrl, setGatewayUrl] = useState("");
   const [gatewayToken, setGatewayToken] = useState("");
   const [userName, setUserName] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const user = getStoredUser();
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-    setUserName(user.name);
-  }, [router]);
-
-  const handleFinish = () => {
-    setStoredWorkspace({
-      id: crypto.randomUUID(),
-      name: wsName || "My Workspace",
-      openclawUrl: gatewayUrl,
-      openclawToken: gatewayToken,
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) {
+        router.push("/login");
+        return;
+      }
+      setUserName(user.user_metadata?.full_name || user.email?.split("@")[0] || "");
+      setLoading(false);
     });
-    setOnboarded(true);
+  }, [router, supabase.auth]);
+
+  const handleFinish = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Save workspace to Supabase
+    await supabase.from("workspaces").insert({
+      name: wsName || "My Workspace",
+      slug: (wsName || "my-workspace").toLowerCase().replace(/\s+/g, "-"),
+      owner_id: user.id,
+      settings: {
+        gateway_url: gatewayUrl || null,
+        gateway_token: gatewayToken || null,
+      },
+    });
+
+    // Mark user as onboarded
+    await supabase.auth.updateUser({
+      data: { onboarded: true },
+    });
+
     router.push("/");
+    router.refresh();
   };
 
   const canNext = () => {
     if (step === 1) return wsName.trim().length > 0;
     return true;
   };
+
+  if (loading) return null;
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-[var(--bg)]">

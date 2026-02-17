@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { agents, initialTasks, initialFeed, columns, colNames, colColors, type Task, type FeedItem, type Agent } from "@/lib/data";
 import { initialMessages, type ChatMessage } from "@/lib/chat-data";
-import { getStoredUser, mockLogout, type User } from "@/lib/mock-auth";
+import { createClient } from "@/lib/supabase/client";
 import AgentProfileModal from "@/components/AgentProfileModal";
 import SquadChatModal from "@/components/SquadChatModal";
 import BroadcastModal from "@/components/BroadcastModal";
@@ -37,13 +37,21 @@ export default function Home() {
   const [showChat, setShowChat] = useState(false);
   const [showBroadcast, setShowBroadcast] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>(initialMessages);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<{ email?: string; name: string } | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const supabase = createClient();
 
   useEffect(() => {
-    setUser(getStoredUser());
-  }, []);
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setUser({
+          email: user.email,
+          name: user.user_metadata?.full_name || user.email?.split("@")[0] || "",
+        });
+      }
+    });
+  }, [supabase.auth]);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -55,8 +63,8 @@ export default function Home() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  const handleLogout = () => {
-    mockLogout();
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     window.location.href = "/login";
   };
 
