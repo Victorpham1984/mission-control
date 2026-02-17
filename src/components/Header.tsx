@@ -9,6 +9,8 @@ const navItems = [
   { key: "/chat/live", label: "Live Chat", emoji: "💬" },
   { key: "/sessions", label: "Sessions", emoji: "📋" },
   { key: "/cron", label: "Cron", emoji: "⏰" },
+  { key: "/hooks", label: "Hooks", emoji: "🪝" },
+  { key: "/routing", label: "Routing", emoji: "🔀" },
   { key: "/settings", label: "Settings", emoji: "⚙️" },
 ];
 
