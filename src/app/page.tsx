@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { columns, colNames, colColors, type Task, type FeedItem, type Agent } from "@/lib/data";
 import { initialMessages, type ChatMessage } from "@/lib/chat-data";
 import { useWorkspaceData, supabase } from "@/lib/supabase/hooks";
@@ -20,7 +21,8 @@ const statusDot: Record<string, string> = {
 };
 
 export default function Home() {
-  const { agents, tasks, setTasks, feed, setFeed, workspaceId, loading, isEmpty, reload } = useWorkspaceData();
+  const router = useRouter();
+  const { agents, dbAgents, tasks, setTasks, feed, setFeed, workspaceId, loading, isEmpty, reload } = useWorkspaceData();
   const [filter, setFilter] = useState("all");
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
   const [modalTask, setModalTask] = useState<Task | null>(null);
@@ -176,15 +178,18 @@ export default function Home() {
           <span className="sm:hidden">CM</span>
         </div>
 
-        <div className="hidden md:flex gap-8 ml-8">
-          <div className="text-center"><div className="text-3xl font-bold">{agents.filter(a => a.status === "working").length}</div><div className="text-[10px] text-[var(--text-dim)] uppercase tracking-widest">Agents</div></div>
-          <div className="text-center"><div className="text-3xl font-bold">{tasks.length}</div><div className="text-[10px] text-[var(--text-dim)] uppercase tracking-widest">Tasks</div></div>
-        </div>
+        {/* Nav tabs - desktop */}
+        <nav className="hidden md:flex gap-1 ml-4">
+          <button className="px-4 py-1.5 rounded-lg text-sm bg-[var(--card)] text-white font-semibold border border-[var(--border)]">Dashboard</button>
+          <button onClick={() => router.push("/agents")} className="px-4 py-1.5 rounded-lg text-sm text-[var(--text-dim)] hover:bg-[var(--card)] transition">Agents</button>
+          <button onClick={() => router.push("/settings")} className="px-4 py-1.5 rounded-lg text-sm text-[var(--text-dim)] hover:bg-[var(--card)] transition">Settings</button>
+        </nav>
 
-        {/* Mobile stats */}
-        <div className="flex md:hidden gap-3 ml-2 text-xs text-[var(--text-dim)]">
-          <span>{agents.filter(a => a.status === "working").length} active</span>
-          <span>{tasks.length} tasks</span>
+        {/* Mobile nav */}
+        <div className="flex md:hidden gap-1 ml-2">
+          <button className="px-2 py-1 rounded text-xs bg-[var(--card)] border border-[var(--border)]">📊</button>
+          <button onClick={() => router.push("/agents")} className="px-2 py-1 rounded text-xs text-[var(--text-dim)]">🤖</button>
+          <button onClick={() => router.push("/settings")} className="px-2 py-1 rounded text-xs text-[var(--text-dim)]">⚙️</button>
         </div>
 
         <div className="ml-auto flex gap-1 md:gap-2">
@@ -410,7 +415,7 @@ export default function Home() {
       )}
 
       {profileAgent && (
-        <AgentProfileModal agent={profileAgent} tasks={tasks} onClose={() => setProfileAgent(null)} onOpenChat={() => setShowChat(true)} />
+        <AgentProfileModal agent={profileAgent} dbAgent={dbAgents.find(d => d.id === profileAgent.id)} tasks={tasks} onClose={() => setProfileAgent(null)} onOpenChat={() => setShowChat(true)} />
       )}
       {showChat && <SquadChatModal messages={chatMessages} onSend={handleChatSend} onClose={() => setShowChat(false)} />}
       {showBroadcast && <BroadcastModal onBroadcast={handleBroadcast} onClose={() => setShowBroadcast(false)} />}
