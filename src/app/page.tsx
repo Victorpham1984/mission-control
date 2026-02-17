@@ -183,7 +183,6 @@ export default function Home() {
         <nav className="hidden md:flex gap-1 ml-4">
           <button className="px-4 py-1.5 rounded-lg text-sm bg-[var(--card)] text-white font-semibold border border-[var(--border)]">Dashboard</button>
           <button onClick={() => router.push("/agents")} className="px-4 py-1.5 rounded-lg text-sm text-[var(--text-dim)] hover:bg-[var(--card)] transition">Agents</button>
-          <button onClick={() => router.push("/chat")} className="px-4 py-1.5 rounded-lg text-sm text-[var(--text-dim)] hover:bg-[var(--card)] transition">Chat</button>
           <button onClick={() => router.push("/broadcast")} className="px-4 py-1.5 rounded-lg text-sm text-[var(--text-dim)] hover:bg-[var(--card)] transition">Broadcast</button>
           <button onClick={() => router.push("/settings")} className="px-4 py-1.5 rounded-lg text-sm text-[var(--text-dim)] hover:bg-[var(--card)] transition">Settings</button>
         </nav>
@@ -192,15 +191,11 @@ export default function Home() {
         <div className="flex md:hidden gap-1 ml-2 overflow-x-auto scrollbar-hide">
           <button className="px-2 py-1 rounded text-xs bg-[var(--card)] border border-[var(--border)]">📊</button>
           <button onClick={() => router.push("/agents")} className="px-2 py-1 rounded text-xs text-[var(--text-dim)]">🤖</button>
-          <button onClick={() => router.push("/chat")} className="px-2 py-1 rounded text-xs text-[var(--text-dim)]">💬</button>
           <button onClick={() => router.push("/broadcast")} className="px-2 py-1 rounded text-xs text-[var(--text-dim)]">📢</button>
           <button onClick={() => router.push("/settings")} className="px-2 py-1 rounded text-xs text-[var(--text-dim)]">⚙️</button>
         </div>
 
         <div className="ml-auto flex gap-1 md:gap-2">
-          <button onClick={() => setShowChat(true)} className="px-2 md:px-3.5 py-1.5 md:py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-xs md:text-sm hover:bg-[var(--card-hover)] transition" title="Squad Chat">
-            💬 <span className="hidden sm:inline">Chat</span>
-          </button>
           <button onClick={() => setShowBroadcast(true)} className="px-2 md:px-3.5 py-1.5 md:py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-xs md:text-sm hover:bg-[var(--card-hover)] transition" title="Broadcast">
             📢 <span className="hidden md:inline">Broadcast</span>
           </button>
