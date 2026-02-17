@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "🐾 Đệ Mission Control",
-  description: "AI Agent Dashboard — COSMATE Command Center",
+  title: "🐾 CommandMate — Mission Control",
+  description: "AI Agent Management Dashboard",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
