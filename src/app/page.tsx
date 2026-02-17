@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { columns, colNames, colColors, type Task, type FeedItem, type Agent } from "@/lib/data";
-import { initialMessages, type ChatMessage } from "@/lib/chat-data";
+// chat-data removed — SquadChatModal reads from Supabase directly
 import { useWorkspaceData, supabase } from "@/lib/supabase/hooks";
 import { seedWorkspaceData } from "@/lib/supabase/seed";
 import AgentProfileModal from "@/components/AgentProfileModal";
@@ -40,7 +40,7 @@ export default function Home() {
   const [profileAgent, setProfileAgent] = useState<Agent | null>(null);
   const [showChat, setShowChat] = useState(false);
   const [showBroadcast, setShowBroadcast] = useState(false);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(initialMessages);
+  // chatMessages removed — SquadChatModal reads from Supabase directly
   const [user, setUser] = useState<{ email?: string; name: string } | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -119,29 +119,9 @@ export default function Home() {
     setNewTitle(""); setNewDesc(""); setNewTags(""); setShowNew(false);
   };
 
-  const handleChatSend = (content: string) => {
-    const msg: ChatMessage = {
-      id: chatMessages.length + 1,
-      sender: user?.name || "You",
-      emoji: "👑",
-      content,
-      time: "Just now",
-    };
-    setChatMessages(prev => [...prev, msg]);
-  };
-
   const handleBroadcast = (title: string, message: string, urgent: boolean) => {
     const prefix = urgent ? "🚨 URGENT" : "📢 BROADCAST";
-    const content = title ? `**${prefix}: ${title}** — ${message}` : `**${prefix}:** ${message}`;
-    const chatMsg: ChatMessage = {
-      id: chatMessages.length + 1,
-      sender: user?.name || "You",
-      emoji: "👑",
-      content,
-      time: "Just now",
-      isSystem: true,
-    };
-    setChatMessages(prev => [...prev, chatMsg]);
+    const content = title ? `${prefix}: ${title} — ${message}` : `${prefix}: ${message}`;
     setFeed(prev => [{
       icon: urgent ? "🚨" : "📢",
       text: title ? `Broadcast: ${title} — ${message}` : `Broadcast: ${message}`,
@@ -401,7 +381,7 @@ export default function Home() {
       {profileAgent && (
         <AgentProfileModal agent={profileAgent} dbAgent={dbAgents.find(d => d.id === profileAgent.id)} tasks={tasks} onClose={() => setProfileAgent(null)} onOpenChat={() => setShowChat(true)} onTaskClick={(t) => { setProfileAgent(null); setModalTask(t); }} />
       )}
-      {showChat && <SquadChatModal messages={chatMessages} onSend={handleChatSend} onClose={() => setShowChat(false)} />}
+      {showChat && <SquadChatModal onClose={() => setShowChat(false)} />}
       {showBroadcast && <BroadcastModal onBroadcast={handleBroadcast} onClose={() => setShowBroadcast(false)} />}
     </div>
   );
