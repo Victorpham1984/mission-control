@@ -90,6 +90,7 @@ export default function SquadChatModal({ onClose }: Props) {
             <h2 className="text-base font-semibold">Squad Chat</h2>
             <span className="text-[11px] text-[var(--text-dim)] bg-[var(--card)] px-2 py-0.5 rounded-full">{messages.length} messages</span>
           </div>
+          <a href="/chat/live" className="text-[10px] text-[var(--accent)] hover:underline mr-2">Open Live Chat →</a>
           <button onClick={onClose} className="text-[var(--text-dim)] hover:text-white text-xl px-2">×</button>
         </div>
 
@@ -106,19 +107,23 @@ export default function SquadChatModal({ onClose }: Props) {
           {messages.map(msg => {
             const agent = getAgent(msg.agent_id);
             const color = colorMap.current.get(msg.agent_id) || "#888";
-            const isSystem = msg.direction === "inbound";
+            const isOwnerMsg = msg.direction === "inbound";
             return (
               <div key={msg.id} className="flex gap-3">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0" style={{ backgroundColor: color + "22", color }}>
-                  {agent?.avatar_emoji || "🤖"}
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0" style={{ backgroundColor: isOwnerMsg ? "#f59e0b22" : color + "22", color: isOwnerMsg ? "#f59e0b" : color }}>
+                  {isOwnerMsg ? "👑" : (agent?.avatar_emoji || "🤖")}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-baseline gap-2 mb-0.5">
-                    <span className="text-[13px] font-semibold" style={{ color }}>{agent?.name || "Unknown"}</span>
-                    {agent?.role && <span className="text-[10px] text-[var(--text-dim)]">{agent.role}</span>}
+                    <span className="text-[13px] font-semibold" style={{ color: isOwnerMsg ? "#f59e0b" : color }}>
+                      {isOwnerMsg ? "Owner" : (agent?.name || "Unknown")}
+                    </span>
+                    <span className="text-[10px] text-[var(--text-dim)]">
+                      {isOwnerMsg ? "Founder" : (agent?.role || "")}
+                    </span>
                     <span className="text-[10px] text-[var(--text-dim)]">{formatTime(msg.created_at)}</span>
                   </div>
-                  <div className={`text-sm leading-relaxed ${isSystem ? "bg-[var(--accent)]/10 border border-[var(--accent)]/20 rounded-lg p-2.5" : "text-[var(--text)]"}`}>
+                  <div className={`text-sm leading-relaxed ${isOwnerMsg ? "bg-amber-500/10 border border-amber-500/20 rounded-lg p-2.5" : "text-[var(--text)]"}`}>
                     {msg.content}
                   </div>
                 </div>

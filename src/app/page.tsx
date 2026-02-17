@@ -163,6 +163,11 @@ export default function Home() {
         <nav className="hidden md:flex gap-1 ml-4">
           <button className="px-4 py-1.5 rounded-lg text-sm bg-[var(--card)] text-white font-semibold border border-[var(--border)]">Dashboard</button>
           <button onClick={() => router.push("/agents")} className="px-4 py-1.5 rounded-lg text-sm text-[var(--text-dim)] hover:bg-[var(--card)] transition">Agents</button>
+          <button onClick={() => router.push("/chat/live")} className="px-4 py-1.5 rounded-lg text-sm text-[var(--text-dim)] hover:bg-[var(--card)] transition">Live Chat</button>
+          <button onClick={() => router.push("/sessions")} className="px-4 py-1.5 rounded-lg text-sm text-[var(--text-dim)] hover:bg-[var(--card)] transition">Sessions</button>
+          <button onClick={() => router.push("/cron")} className="px-4 py-1.5 rounded-lg text-sm text-[var(--text-dim)] hover:bg-[var(--card)] transition">Cron</button>
+          <button onClick={() => router.push("/hooks")} className="px-4 py-1.5 rounded-lg text-sm text-[var(--text-dim)] hover:bg-[var(--card)] transition">Hooks</button>
+          <button onClick={() => router.push("/routing")} className="px-4 py-1.5 rounded-lg text-sm text-[var(--text-dim)] hover:bg-[var(--card)] transition">Routing</button>
           <button onClick={() => router.push("/settings")} className="px-4 py-1.5 rounded-lg text-sm text-[var(--text-dim)] hover:bg-[var(--card)] transition">Settings</button>
         </nav>
 
@@ -170,6 +175,11 @@ export default function Home() {
         <div className="flex md:hidden gap-1 ml-2 overflow-x-auto scrollbar-hide">
           <button className="px-2 py-1 rounded text-xs bg-[var(--card)] border border-[var(--border)]">📊</button>
           <button onClick={() => router.push("/agents")} className="px-2 py-1 rounded text-xs text-[var(--text-dim)]">🤖</button>
+          <button onClick={() => router.push("/chat/live")} className="px-2 py-1 rounded text-xs text-[var(--text-dim)]">💬</button>
+          <button onClick={() => router.push("/sessions")} className="px-2 py-1 rounded text-xs text-[var(--text-dim)]">📋</button>
+          <button onClick={() => router.push("/cron")} className="px-2 py-1 rounded text-xs text-[var(--text-dim)]">⏰</button>
+          <button onClick={() => router.push("/hooks")} className="px-2 py-1 rounded text-xs text-[var(--text-dim)]">🪝</button>
+          <button onClick={() => router.push("/routing")} className="px-2 py-1 rounded text-xs text-[var(--text-dim)]">🔀</button>
           <button onClick={() => router.push("/settings")} className="px-2 py-1 rounded text-xs text-[var(--text-dim)]">⚙️</button>
         </div>
 
