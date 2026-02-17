@@ -29,3 +29,6 @@ body { background: var(--bg); color: var(--text); }
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
 .animate-modal { animation: modal-in 0.2s ease-out; }
+
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
