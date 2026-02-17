@@ -248,18 +248,18 @@ export default function HooksPage() {
   return (
     <div className="h-screen flex flex-col bg-[var(--bg)]">
       <Header />
-      <main className="flex-1 overflow-auto p-4 md:p-6">
-        <div className="max-w-6xl mx-auto space-y-6">
+      <main className="flex-1 overflow-auto p-3 md:p-6">
+        <div className="max-w-6xl mx-auto space-y-4 md:space-y-6">
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold">🪝 Webhook & Hook Manager</h1>
+            <h1 className="text-xl md:text-2xl font-bold">🪝 <span className="hidden sm:inline">Webhook & Hook Manager</span><span className="sm:hidden">Hooks</span></h1>
           </div>
 
           {/* Tabs */}
           <div className="flex gap-1 bg-[var(--surface)] p-1 rounded-xl border border-[var(--border)] overflow-x-auto">
             {tabs.map(t => (
               <button key={t.key} onClick={() => setTab(t.key)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap ${tab === t.key ? "bg-[var(--card)] text-white border border-[var(--border)]" : "text-[var(--text-dim)] hover:text-white"}`}>
-                {t.emoji} {t.label}
+                className={`px-2.5 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition whitespace-nowrap ${tab === t.key ? "bg-[var(--card)] text-white border border-[var(--border)]" : "text-[var(--text-dim)] hover:text-white"}`}>
+                {t.emoji} <span className="hidden sm:inline">{t.label}</span>
               </button>
             ))}
           </div>
@@ -273,16 +273,16 @@ export default function HooksPage() {
                 <div className="text-center text-[var(--text-dim)] py-12">No hooks configured</div>
               ) : (
                 hooks.map((h, i) => (
-                  <div key={i} className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-4 flex items-center gap-4">
+                  <div key={i} className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-3 md:p-4 flex items-center gap-3 md:gap-4">
                     <div className={`w-3 h-3 rounded-full shrink-0 ${h.enabled ? "bg-green-400" : "bg-gray-500"}`} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-semibold">{h.name}</span>
+                        <span className="font-semibold text-sm">{h.name}</span>
                         {typeBadge(h.type)}
                       </div>
                       <div className="text-xs text-[var(--text-dim)] truncate mt-1">{h.url || h.endpoint || "—"}</div>
                     </div>
-                    <div className="text-xs text-[var(--text-dim)] shrink-0">
+                    <div className="text-xs text-[var(--text-dim)] shrink-0 hidden sm:block">
                       {h.lastTriggered ? new Date(h.lastTriggered).toLocaleString() : "Never triggered"}
                     </div>
                   </div>
@@ -293,9 +293,9 @@ export default function HooksPage() {
 
           {/* Quick Actions */}
           {tab === "actions" && (
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
               {/* Wake Agent */}
-              <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 space-y-4">
+              <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-3 md:p-5 space-y-3 md:space-y-4">
                 <h3 className="font-semibold flex items-center gap-2">⚡ Wake Agent</h3>
                 <input value={wakeText} onChange={e => setWakeText(e.target.value)} placeholder="Wake text (optional)"
                   className="w-full bg-[var(--card)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm" />
@@ -314,7 +314,7 @@ export default function HooksPage() {
               </div>
 
               {/* Agent Task */}
-              <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 space-y-4">
+              <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-3 md:p-5 space-y-3 md:space-y-4">
                 <h3 className="font-semibold flex items-center gap-2">🤖 Run Agent Task</h3>
                 <textarea value={taskMessage} onChange={e => setTaskMessage(e.target.value)} placeholder="Message / task description" rows={2}
                   className="w-full bg-[var(--card)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm resize-none" />
@@ -356,29 +356,35 @@ export default function HooksPage() {
                 </div>
               )}
 
-              <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-5 space-y-4">
-                <div className="flex gap-2">
-                  <select value={consoleMethod} onChange={e => setConsoleMethod(e.target.value)}
-                    className="bg-[var(--card)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm font-mono">
-                    {["GET", "POST", "PUT", "PATCH", "DELETE"].map(m => <option key={m} value={m}>{m}</option>)}
-                  </select>
+              <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-3 md:p-5 space-y-4">
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="flex gap-2">
+                    <select value={consoleMethod} onChange={e => setConsoleMethod(e.target.value)}
+                      className="bg-[var(--card)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm font-mono">
+                      {["GET", "POST", "PUT", "PATCH", "DELETE"].map(m => <option key={m} value={m}>{m}</option>)}
+                    </select>
+                    <button onClick={handleConsoleSend} disabled={consoleSending || !consoleUrl}
+                      className="sm:hidden bg-[var(--accent)] text-black px-4 py-2 rounded-lg text-sm font-semibold hover:brightness-110 transition disabled:opacity-50">
+                      {consoleSending ? "..." : "Send"}
+                    </button>
+                  </div>
                   <input value={consoleUrl} onChange={e => setConsoleUrl(e.target.value)} placeholder="https://..."
-                    className="flex-1 bg-[var(--card)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm font-mono" />
+                    className="flex-1 bg-[var(--card)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm font-mono w-full" />
                   <button onClick={handleConsoleSend} disabled={consoleSending || !consoleUrl}
-                    className="bg-[var(--accent)] text-black px-4 py-2 rounded-lg text-sm font-semibold hover:brightness-110 transition disabled:opacity-50">
+                    className="hidden sm:block bg-[var(--accent)] text-black px-4 py-2 rounded-lg text-sm font-semibold hover:brightness-110 transition disabled:opacity-50 shrink-0">
                     {consoleSending ? "..." : "Send"}
                   </button>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                   <div>
                     <label className="text-xs text-[var(--text-dim)] mb-1 block">Headers (JSON)</label>
-                    <textarea value={consoleHeaders} onChange={e => setConsoleHeaders(e.target.value)} rows={4}
+                    <textarea value={consoleHeaders} onChange={e => setConsoleHeaders(e.target.value)} rows={3}
                       className="w-full bg-[var(--card)] border border-[var(--border)] rounded-lg px-3 py-2 text-xs font-mono resize-none" />
                   </div>
                   <div>
                     <label className="text-xs text-[var(--text-dim)] mb-1 block">Body</label>
-                    <textarea value={consoleBody} onChange={e => setConsoleBody(e.target.value)} rows={4}
+                    <textarea value={consoleBody} onChange={e => setConsoleBody(e.target.value)} rows={3}
                       className="w-full bg-[var(--card)] border border-[var(--border)] rounded-lg px-3 py-2 text-xs font-mono resize-none" />
                   </div>
                 </div>

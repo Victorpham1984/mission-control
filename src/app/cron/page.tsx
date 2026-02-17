@@ -131,8 +131,8 @@ function Toast({ message, onClose }: { message: string; onClose: () => void }) {
 // ── Confirm Dialog ─────────────────────────────────────
 function ConfirmDialog({ message, onConfirm, onCancel }: { message: string; onConfirm: () => void; onCancel: () => void }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={onCancel}>
-      <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6 max-w-sm w-full mx-4 animate-modal" onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/60" onClick={onCancel}>
+      <div className="bg-[var(--surface)] border border-[var(--border)] rounded-t-xl md:rounded-xl p-5 md:p-6 max-w-sm w-full md:mx-4 animate-modal" onClick={e => e.stopPropagation()}>
         <p className="text-sm mb-5">{message}</p>
         <div className="flex gap-3 justify-end">
           <button onClick={onCancel} className="px-4 py-2 text-sm rounded-lg bg-[var(--card)] hover:bg-[var(--card-hover)] transition">Cancel</button>
@@ -182,13 +182,13 @@ function JobModal({ job, onClose, onSave }: { job: CronJob | null; onClose: () =
   const labelCls = "block text-xs text-[var(--text-dim)] mb-1";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
-      <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-modal" onClick={e => e.stopPropagation()}>
-        <div className="p-5 border-b border-[var(--border)] flex justify-between items-center">
-          <h2 className="text-lg font-bold">{isEdit ? "Edit Job" : "Add New Job"}</h2>
+    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/60 md:p-4" onClick={onClose}>
+      <div className="bg-[var(--surface)] border border-[var(--border)] rounded-t-xl md:rounded-xl w-full md:max-w-lg max-h-[95vh] md:max-h-[90vh] overflow-y-auto animate-modal" onClick={e => e.stopPropagation()}>
+        <div className="p-4 md:p-5 border-b border-[var(--border)] flex justify-between items-center">
+          <h2 className="text-base md:text-lg font-bold">{isEdit ? "Edit Job" : "Add New Job"}</h2>
           <button onClick={onClose} className="text-[var(--text-dim)] hover:text-white text-xl">×</button>
         </div>
-        <div className="p-5 space-y-4">
+        <div className="p-4 md:p-5 space-y-4">
           {/* Name */}
           <div>
             <label className={labelCls}>Name</label>
@@ -276,7 +276,7 @@ function JobModal({ job, onClose, onSave }: { job: CronJob | null; onClose: () =
           </div>
 
           {/* Optional fields */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className={labelCls}>Model Override (optional)</label>
               <input className={inputCls} value={form.model} onChange={e => set({ model: e.target.value })} placeholder="e.g. claude-sonnet-4-20250514" />
@@ -305,7 +305,7 @@ function JobModal({ job, onClose, onSave }: { job: CronJob | null; onClose: () =
           </label>
         </div>
 
-        <div className="p-5 border-t border-[var(--border)] flex justify-end gap-3">
+        <div className="p-4 md:p-5 border-t border-[var(--border)] flex justify-end gap-3">
           <button onClick={onClose} className="px-4 py-2 text-sm rounded-lg bg-[var(--card)] hover:bg-[var(--card-hover)] transition">Cancel</button>
           <button onClick={() => onSave(form, job?.id)} className="px-4 py-2 text-sm rounded-lg bg-[var(--accent)] text-black font-semibold hover:brightness-110 transition">
             {isEdit ? "Update" : "Create"}
@@ -332,10 +332,10 @@ function RunHistoryModal({ job, onClose }: { job: CronJob; onClose: () => void }
   useEffect(() => { fetchRuns(); const i = setInterval(fetchRuns, 30000); return () => clearInterval(i); }, [fetchRuns]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
-      <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl w-full max-w-lg max-h-[80vh] overflow-y-auto animate-modal" onClick={e => e.stopPropagation()}>
-        <div className="p-5 border-b border-[var(--border)] flex justify-between items-center">
-          <h2 className="text-lg font-bold">Run History — {job.name || job.id}</h2>
+    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/60 md:p-4" onClick={onClose}>
+      <div className="bg-[var(--surface)] border border-[var(--border)] rounded-t-xl md:rounded-xl w-full md:max-w-lg max-h-[85vh] md:max-h-[80vh] overflow-y-auto animate-modal" onClick={e => e.stopPropagation()}>
+        <div className="p-4 md:p-5 border-b border-[var(--border)] flex justify-between items-center">
+          <h2 className="text-base md:text-lg font-bold truncate">Run History — {job.name || job.id}</h2>
           <button onClick={onClose} className="text-[var(--text-dim)] hover:text-white text-xl">×</button>
         </div>
         <div className="p-5">
@@ -442,9 +442,9 @@ export default function CronPage() {
   return (
     <div className="min-h-screen bg-[var(--bg)] text-white flex flex-col">
       <Header />
-      <main className="flex-1 max-w-5xl w-full mx-auto p-4 md:p-6 space-y-4">
+      <main className="flex-1 max-w-5xl w-full mx-auto p-3 md:p-6 space-y-3 md:space-y-4">
         {/* Status Bar */}
-        <div className="flex flex-wrap gap-3 items-center bg-[var(--surface)] border border-[var(--border)] rounded-xl px-4 py-3">
+        <div className="flex flex-wrap gap-2 md:gap-3 items-center bg-[var(--surface)] border border-[var(--border)] rounded-xl px-3 py-2.5 md:px-4 md:py-3">
           <div className="flex items-center gap-2">
             <span className={`w-2 h-2 rounded-full ${status.running !== false ? "bg-emerald-400" : "bg-red-400"}`} />
             <span className="text-sm font-medium">{status.running !== false ? "Scheduler Running" : "Scheduler Stopped"}</span>
@@ -497,19 +497,19 @@ export default function CronPage() {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
                     <button onClick={() => handleToggle(job)} title={job.enabled !== false ? "Disable" : "Enable"}
                       className={`w-10 h-5 rounded-full relative transition ${job.enabled !== false ? "bg-emerald-500" : "bg-[var(--border)]"}`}>
                       <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${job.enabled !== false ? "left-5" : "left-0.5"}`} />
                     </button>
-                    <button onClick={() => handleRunNow(job)} className="px-3 py-1 text-xs rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition">
-                      ▶ Run
+                    <button onClick={() => handleRunNow(job)} className="px-2 md:px-3 py-1 text-xs rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition">
+                      <span className="md:hidden">▶</span><span className="hidden md:inline">▶ Run</span>
                     </button>
-                    <button onClick={() => setModalJob(job)} className="px-3 py-1 text-xs rounded-lg bg-[var(--card-hover)] text-[var(--text-dim)] hover:text-white transition">
-                      Edit
+                    <button onClick={() => setModalJob(job)} className="px-2 md:px-3 py-1 text-xs rounded-lg bg-[var(--card-hover)] text-[var(--text-dim)] hover:text-white transition">
+                      <span className="md:hidden">✏️</span><span className="hidden md:inline">Edit</span>
                     </button>
-                    <button onClick={() => setDeleteJob(job)} className="px-3 py-1 text-xs rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition">
-                      Delete
+                    <button onClick={() => setDeleteJob(job)} className="px-2 md:px-3 py-1 text-xs rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition">
+                      <span className="md:hidden">🗑</span><span className="hidden md:inline">Delete</span>
                     </button>
                   </div>
                 </div>
