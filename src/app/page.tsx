@@ -6,6 +6,7 @@ import { initialMessages, type ChatMessage } from "@/lib/chat-data";
 import { useWorkspaceData, supabase } from "@/lib/supabase/hooks";
 import { seedWorkspaceData } from "@/lib/supabase/seed";
 import AgentProfileModal from "@/components/AgentProfileModal";
+import TaskDetailModal from "@/components/TaskDetailModal";
 import SquadChatModal from "@/components/SquadChatModal";
 import BroadcastModal from "@/components/BroadcastModal";
 
@@ -362,35 +363,18 @@ export default function Home() {
         </aside>
       </div>
 
-      {/* Task Modal */}
+      {/* Task Detail Modal */}
       {modalTask && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-end md:items-center justify-center p-0 md:p-4" onClick={() => setModalTask(null)}>
-          <div className="bg-[var(--surface)] rounded-t-2xl md:rounded-2xl w-full max-w-[600px] max-h-[85vh] overflow-y-auto border border-[var(--border)] animate-modal" onClick={e => e.stopPropagation()}>
-            <div className="p-4 md:p-5 border-b border-[var(--border)] flex justify-between items-center sticky top-0 bg-[var(--surface)] z-10">
-              <h2 className="text-base font-semibold">● Task Detail</h2>
-              <button onClick={() => setModalTask(null)} className="text-[var(--text-dim)] hover:text-white px-2 text-xl">×</button>
-            </div>
-            <div className="p-4 md:p-6 space-y-4">
-              <div><div className="text-[11px] uppercase tracking-wider text-[var(--text-dim)] mb-1">Title</div><div className="text-base font-semibold">{modalTask.title}</div></div>
-              <div><div className="text-[11px] uppercase tracking-wider text-[var(--text-dim)] mb-1">Status</div>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold" style={{ background: colColors[modalTask.status] + "22", color: colColors[modalTask.status] }}>
-                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: colColors[modalTask.status] }} /> {colNames[modalTask.status]}
-                </span>
-              </div>
-              <div><div className="text-[11px] uppercase tracking-wider text-[var(--text-dim)] mb-1">Agent</div>
-                {(() => { const a = agents.find(x => x.id === modalTask.agent); return a ? <div className="flex items-center gap-2"><div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm" style={{ background: a.color + "22", color: a.color }}>{a.emoji}</div>{a.name}</div> : <span className="text-[var(--text-dim)]">Unassigned</span>; })()}
-              </div>
-              <div><div className="text-[11px] uppercase tracking-wider text-[var(--text-dim)] mb-1">Description</div><div className="text-sm">{modalTask.desc}</div></div>
-              {modalTask.tags.length > 0 && <div><div className="text-[11px] uppercase tracking-wider text-[var(--text-dim)] mb-1">Tags</div><div className="flex gap-1 flex-wrap">{modalTask.tags.map(t => <span key={t} className="text-[9px] px-1.5 py-0.5 rounded bg-[var(--surface)] text-[var(--text-dim)]">{t}</span>)}</div></div>}
-              {modalTask.result && <div><div className="text-[11px] uppercase tracking-wider text-[var(--text-dim)] mb-1">Result</div><pre className="bg-[var(--card)] p-3 rounded-lg text-xs whitespace-pre-wrap font-mono max-h-[200px] md:max-h-[300px] overflow-y-auto">{modalTask.result}</pre></div>}
-              <div className="flex gap-2 pt-2 flex-wrap">
-                {modalTask.status !== "done" ? columns.filter(c => c !== modalTask.status).map(c => (
-                  <button key={c} onClick={() => moveTask(modalTask.id, c as Task["status"])} className="px-3 py-1.5 rounded-md border border-[var(--border)] bg-[var(--card)] text-xs hover:bg-[var(--card-hover)] transition">→ {colNames[c]}</button>
-                )) : <span className="text-green-400 text-sm">✅ Completed</span>}
-              </div>
-            </div>
-          </div>
-        </div>
+        <TaskDetailModal
+          task={modalTask}
+          agents={agents}
+          dbAgents={dbAgents}
+          workspaceId={workspaceId}
+          onClose={() => setModalTask(null)}
+          onArchive={(id) => {
+            moveTask(id, "done");
+          }}
+        />
       )}
 
       {/* New Task Modal */}
@@ -419,7 +403,7 @@ export default function Home() {
       )}
 
       {profileAgent && (
-        <AgentProfileModal agent={profileAgent} dbAgent={dbAgents.find(d => d.id === profileAgent.id)} tasks={tasks} onClose={() => setProfileAgent(null)} onOpenChat={() => setShowChat(true)} />
+        <AgentProfileModal agent={profileAgent} dbAgent={dbAgents.find(d => d.id === profileAgent.id)} tasks={tasks} onClose={() => setProfileAgent(null)} onOpenChat={() => setShowChat(true)} onTaskClick={(t) => { setProfileAgent(null); setModalTask(t); }} />
       )}
       {showChat && <SquadChatModal messages={chatMessages} onSend={handleChatSend} onClose={() => setShowChat(false)} />}
       {showBroadcast && <BroadcastModal onBroadcast={handleBroadcast} onClose={() => setShowBroadcast(false)} />}
