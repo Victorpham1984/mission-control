@@ -6,7 +6,6 @@ import { supabase } from "@/lib/supabase/hooks";
 const navItems = [
   { key: "/", label: "Dashboard", emoji: "📊" },
   { key: "/agents", label: "Agents", emoji: "🤖" },
-  { key: "/chat", label: "Chat", emoji: "💬" },
   { key: "/broadcast", label: "Broadcast", emoji: "📢" },
   { key: "/settings", label: "Settings", emoji: "⚙️" },
 ];
