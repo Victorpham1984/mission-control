@@ -33,7 +33,7 @@ export type Agent = {
   id: string;
   workspace_id: string;
   name: string;
-  type: "openclaw" | "crewai" | "custom";
+  type: "openclaw" | "crewai" | "custom" | "founder";
   description: string | null;
   avatar_url: string | null;
   status: "online" | "offline" | "error" | "paused";

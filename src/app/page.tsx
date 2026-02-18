@@ -14,6 +14,7 @@ const badgeClass: Record<string, string> = {
   lead: "bg-amber-500 text-black",
   spc: "bg-purple-500 text-white",
   int: "bg-blue-500 text-white",
+  founder: "bg-amber-400 text-black",
 };
 const statusDot: Record<string, string> = {
   working: "bg-green-400 shadow-[0_0_6px_#4ade80]",
@@ -231,7 +232,7 @@ export default function Home() {
               <div className="text-3xl mb-2">🤖</div>
               No agents yet
             </div>
-          ) : agents.map(a => (
+          ) : [...agents].sort((a, b) => (a.badge === "founder" ? -1 : b.badge === "founder" ? 1 : 0)).map(a => (
             <div key={a.id}
               onClick={() => { setProfileAgent(a); setSidebarOpen(false); }}
               className={`flex items-center gap-3 px-4 py-2.5 cursor-pointer transition border-l-[3px] ${selectedAgent === a.id ? "bg-[var(--card)] border-[var(--accent)]" : "border-transparent hover:bg-[var(--card)]"}`}>

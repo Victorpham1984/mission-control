@@ -119,7 +119,7 @@ CREATE TABLE public.agents (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
-  type TEXT NOT NULL DEFAULT 'custom' CHECK (type IN ('openclaw', 'crewai', 'custom')),
+  type TEXT NOT NULL DEFAULT 'custom' CHECK (type IN ('openclaw', 'crewai', 'custom', 'founder')),
   description TEXT,
   avatar_url TEXT,
   status TEXT NOT NULL DEFAULT 'offline' CHECK (status IN ('online', 'offline', 'error', 'paused')),
@@ -236,3 +236,33 @@ CREATE TRIGGER update_workspaces_updated_at
 CREATE TRIGGER update_agents_updated_at
   BEFORE UPDATE ON public.agents
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
+
+-- ============================================================
+-- AUTO-CREATE FOUNDER AGENT ON WORKSPACE CREATION
+-- ============================================================
+CREATE OR REPLACE FUNCTION public.handle_new_workspace_founder()
+RETURNS TRIGGER AS $$
+DECLARE
+  owner_profile RECORD;
+BEGIN
+  SELECT full_name, avatar_url FROM public.profiles WHERE id = NEW.owner_id INTO owner_profile;
+
+  INSERT INTO public.agents (workspace_id, name, type, role, about, avatar_emoji, status, config, description)
+  VALUES (
+    NEW.id,
+    COALESCE(owner_profile.full_name, 'Founder'),
+    'founder',
+    'Founder',
+    'Workspace founder & owner',
+    '👑',
+    'online',
+    '{"badge": "founder", "color": "#f59e0b"}'::jsonb,
+    'Auto-created founder agent'
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER on_workspace_created_founder
+  AFTER INSERT ON public.workspaces
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_workspace_founder();

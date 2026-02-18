@@ -2,7 +2,7 @@ export type Agent = {
   id: string;
   name: string;
   role: string;
-  badge: "lead" | "spc" | "int";
+  badge: "lead" | "spc" | "int" | "founder";
   color: string;
   status: "working" | "idle" | "error";
   emoji: string;

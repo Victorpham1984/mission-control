@@ -19,7 +19,7 @@ function mapAgent(a: DbAgent): Agent {
     id: a.id,
     name: a.name,
     role: a.role || cfg.role || a.description || "",
-    badge: (cfg.badge as Agent["badge"]) || "int",
+    badge: a.type === "founder" ? "founder" : (cfg.badge as Agent["badge"]) || "int",
     color: cfg.color || "#60a5fa",
     status: statusMap[a.status] || "idle",
     emoji: a.avatar_emoji || cfg.emoji || "🤖",
