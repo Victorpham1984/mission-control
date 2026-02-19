@@ -19,7 +19,7 @@ function mapAgent(a: DbAgent): Agent {
     id: a.id,
     name: a.name,
     role: a.role || cfg.role || a.description || "",
-    badge: (cfg.badge as Agent["badge"]) || "int",
+    badge: a.type === "founder" ? "founder" : (cfg.badge as Agent["badge"]) || "int",
     color: cfg.color || "#60a5fa",
     status: statusMap[a.status] || "idle",
     emoji: a.avatar_emoji || cfg.emoji || "🤖",
@@ -130,6 +130,215 @@ export function useWorkspaceData() {
   }, [workspaceId, loadData]);
 
   return { agents, dbAgents, tasks, setTasks, feed, setFeed, workspaceId, loading, isEmpty, reload: loadData };
+}
+
+// === Task Queue types & hook ===
+
+export type TaskQueueItem = {
+  id: string;
+  title: string;
+  description: string | null;
+  type: string;
+  status: string; // queued, in-progress, pending-approval, completed, failed
+  priority: string; // urgent, normal, background
+  assigned_agent_id: string | null;
+  assigned_agent_name?: string;
+  assigned_agent_emoji?: string;
+  progress_percent: number | null;
+  needs_approval: boolean | null;
+  approval_status: string | null;
+  approval_rating: number | null;
+  approval_feedback: string | null;
+  output: Record<string, unknown> | null;
+  error: string | null;
+  required_skills: string[] | null;
+  status_message: string | null;
+  duration_ms: number | null;
+  claimed_at: string | null;
+  completed_at: string | null;
+  created_at: string | null;
+  metadata: Record<string, unknown> | null;
+};
+
+export type TaskQueueMetrics = {
+  completed: number;
+  pendingApproval: number;
+  inProgress: number;
+  failed: number;
+  queued: number;
+};
+
+export function useTaskQueue() {
+  const [tasks, setTasks] = useState<TaskQueueItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [workspaceId, setWorkspaceId] = useState<string | null>(null);
+
+  const loadData = useCallback(async () => {
+    const wsId = await getWorkspaceId();
+    if (!wsId) { setLoading(false); return; }
+    setWorkspaceId(wsId);
+
+    // Fetch task_queue with agent info
+    const { data: rawTasks } = await supabase
+      .from("task_queue")
+      .select("*, agents!task_queue_assigned_agent_id_fkey(name, avatar_emoji)")
+      .eq("workspace_id", wsId)
+      .order("created_at", { ascending: false });
+
+    const { data: agentsData } = await supabase
+      .from("agents")
+      .select("id, name, avatar_emoji")
+      .eq("workspace_id", wsId);
+
+    const agentMap = new Map((agentsData || []).map(a => [a.id, a]));
+
+    const mapped: TaskQueueItem[] = (rawTasks || []).map((t: Record<string, unknown>) => {
+      const agent = t.assigned_agent_id ? agentMap.get(t.assigned_agent_id as string) : null;
+      return {
+        ...t,
+        assigned_agent_name: agent?.name || undefined,
+        assigned_agent_emoji: agent?.avatar_emoji || undefined,
+      } as TaskQueueItem;
+    });
+
+    setTasks(mapped);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { loadData(); }, [loadData]);
+
+  // Realtime
+  useEffect(() => {
+    if (!workspaceId) return;
+    const channel = supabase
+      .channel("task-queue-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "task_queue", filter: `workspace_id=eq.${workspaceId}` }, () => loadData())
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [workspaceId, loadData]);
+
+  const pendingApprovals = tasks.filter(t => t.status === "pending-approval");
+  const activeTasks = tasks.filter(t => t.status === "in-progress");
+  const completedTasks = tasks.filter(t => t.status === "completed");
+  const queuedTasks = tasks.filter(t => t.status === "queued");
+  const failedTasks = tasks.filter(t => t.status === "failed");
+
+  const metrics: TaskQueueMetrics = {
+    completed: completedTasks.length,
+    pendingApproval: pendingApprovals.length,
+    inProgress: activeTasks.length,
+    failed: failedTasks.length,
+    queued: queuedTasks.length,
+  };
+
+  const approveTask = async (taskId: string, rating: number, comment?: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase.from("task_queue").update({
+      approval_status: "approved",
+      status: "completed",
+      approval_rating: rating,
+      approval_feedback: comment || null,
+      approved_by: user?.id || null,
+      approved_at: new Date().toISOString(),
+    }).eq("id", taskId);
+  };
+
+  const rejectTask = async (taskId: string, feedback: string, action: "revise" | "reassign" | "cancel") => {
+    const { data: { user } } = await supabase.auth.getUser();
+    const newStatus = action === "cancel" ? "failed" : "queued";
+    await supabase.from("task_queue").update({
+      approval_status: "rejected",
+      status: newStatus,
+      approval_feedback: feedback,
+      approved_by: user?.id || null,
+      approved_at: new Date().toISOString(),
+    }).eq("id", taskId);
+  };
+
+  return {
+    tasks, pendingApprovals, activeTasks, completedTasks, queuedTasks, failedTasks,
+    metrics, loading, approveTask, rejectTask, reload: loadData,
+  };
+}
+
+// === Agent Heartbeats hook ===
+
+export type AgentHeartbeat = {
+  agent_id: string;
+  status: "online" | "away" | "offline";
+  status_message: string | null;
+  last_heartbeat: string | null;
+  current_task_id: string | null;
+  load: number | null;
+};
+
+export function useAgentHeartbeats() {
+  const [heartbeats, setHeartbeats] = useState<Map<string, AgentHeartbeat>>(new Map());
+  const [loading, setLoading] = useState(true);
+
+  const loadHeartbeats = useCallback(async () => {
+    const wsId = await getWorkspaceId();
+    if (!wsId) { setLoading(false); return; }
+
+    // Get latest heartbeat per agent using distinct on
+    const { data: agents } = await supabase
+      .from("agents")
+      .select("id")
+      .eq("workspace_id", wsId);
+
+    if (!agents) { setLoading(false); return; }
+
+    const agentIds = agents.map(a => a.id);
+    const { data: hbs } = await supabase
+      .from("agent_heartbeats")
+      .select("*")
+      .in("agent_id", agentIds)
+      .order("created_at", { ascending: false });
+
+    const map = new Map<string, AgentHeartbeat>();
+    const now = Date.now();
+
+    // Group by agent, take latest
+    for (const hb of (hbs || [])) {
+      if (map.has(hb.agent_id)) continue;
+      const elapsed = now - new Date(hb.created_at || 0).getTime();
+      const fiveMin = 5 * 60 * 1000;
+      const thirtyMin = 30 * 60 * 1000;
+      let status: "online" | "away" | "offline" = "offline";
+      if (elapsed < fiveMin) status = "online";
+      else if (elapsed < thirtyMin) status = "away";
+
+      const meta = hb.metadata as Record<string, unknown> | null;
+      map.set(hb.agent_id, {
+        agent_id: hb.agent_id,
+        status,
+        status_message: (meta?.status_message as string) || null,
+        last_heartbeat: hb.created_at,
+        current_task_id: hb.current_task_id,
+        load: hb.load,
+      });
+    }
+
+    // Agents with no heartbeat = offline
+    for (const id of agentIds) {
+      if (!map.has(id)) {
+        map.set(id, { agent_id: id, status: "offline", status_message: null, last_heartbeat: null, current_task_id: null, load: null });
+      }
+    }
+
+    setHeartbeats(map);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { loadHeartbeats(); }, [loadHeartbeats]);
+
+  // Refresh every 30s
+  useEffect(() => {
+    const interval = setInterval(loadHeartbeats, 30000);
+    return () => clearInterval(interval);
+  }, [loadHeartbeats]);
+
+  return { heartbeats, loading };
 }
 
 export { supabase, getWorkspaceId };
