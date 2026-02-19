@@ -9,6 +9,7 @@ import AgentProfileModal from "@/components/AgentProfileModal";
 import TaskDetailModal from "@/components/TaskDetailModal";
 import SquadChatModal from "@/components/SquadChatModal";
 import BroadcastModal from "@/components/BroadcastModal";
+import OutcomeDashboard from "@/components/OutcomeDashboard";
 
 const badgeClass: Record<string, string> = {
   lead: "bg-amber-500 text-black",
@@ -34,6 +35,9 @@ export default function Home() {
   const [newAgent, setNewAgent] = useState("");
   const [newTags, setNewTags] = useState("");
   const [seeding, setSeeding] = useState(false);
+
+  // View toggle: outcome (new) vs kanban (legacy)
+  const [view, setView] = useState<"outcome" | "kanban">("outcome");
 
   // Phase 1 state
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -194,6 +198,14 @@ export default function Home() {
           <button onClick={() => router.push("/docs")} className="px-2 md:px-3.5 py-1.5 md:py-2 rounded-lg border border-[var(--border)] bg-[var(--card)] text-xs md:text-sm hover:bg-[var(--card-hover)] transition" title="Docs">
             📄 <span className="hidden sm:inline">Docs</span>
           </button>
+          <div className="flex rounded-lg border border-[var(--border)] overflow-hidden">
+            <button onClick={() => setView("outcome")} className={`px-2 md:px-3 py-1.5 text-xs transition ${view === "outcome" ? "bg-[var(--accent)] text-black font-semibold" : "bg-[var(--card)] text-[var(--text-dim)] hover:bg-[var(--card-hover)]"}`}>
+              📊 <span className="hidden md:inline">Outcomes</span>
+            </button>
+            <button onClick={() => setView("kanban")} className={`px-2 md:px-3 py-1.5 text-xs transition ${view === "kanban" ? "bg-[var(--accent)] text-black font-semibold" : "bg-[var(--card)] text-[var(--text-dim)] hover:bg-[var(--card-hover)]"}`}>
+              📋 <span className="hidden md:inline">Kanban</span>
+            </button>
+          </div>
           <button onClick={() => setShowNew(true)} className="px-2 md:px-4 py-1.5 md:py-2 rounded-lg bg-[var(--accent)] text-black text-xs md:text-sm font-semibold hover:brightness-110 transition">
             + <span className="hidden sm:inline">New Task</span>
           </button>
@@ -254,6 +266,9 @@ export default function Home() {
         </aside>
 
         {/* Main Content */}
+        {view === "outcome" ? (
+          <OutcomeDashboard />
+        ) : (
         <main className="flex-1 overflow-auto p-2 md:p-4 flex flex-col gap-2 md:gap-3 min-w-0">
           {/* Empty State */}
           {isEmpty && (
@@ -323,6 +338,7 @@ export default function Home() {
             </>
           )}
         </main>
+        )}
 
         {/* Live Feed FAB - mobile */}
         <button onClick={() => setShowFeed(!showFeed)} className="md:hidden fixed bottom-4 right-4 z-20 w-12 h-12 rounded-full bg-[var(--card)] border border-[var(--border)] text-lg shadow-lg flex items-center justify-center">

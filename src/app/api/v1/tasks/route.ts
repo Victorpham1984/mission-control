@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
 
   const supabase = getServiceClient();
 
-  // TODO Week 2: Full implementation with skill matching & auto-assignment
+  // Create the task
   const { data: task, error } = await supabase
     .from("task_queue")
     .insert({
@@ -43,12 +43,65 @@ export async function POST(req: NextRequest) {
     return apiError("internal_error", "Failed to create task: " + error.message, 500);
   }
 
+  // Calculate position in queue
+  const { count } = await supabase
+    .from("task_queue")
+    .select("*", { count: "exact", head: true })
+    .eq("workspace_id", auth.workspaceId)
+    .eq("status", "queued")
+    .lt("created_at", task.created_at);
+
+  const position = (count ?? 0) + 1;
+
+  // Auto-assignment: find idle agent with matching skills
+  let autoAssigned = false;
+  const reqSkills = body.required_skills || [];
+  if (reqSkills.length > 0) {
+    // Find agents with matching skills that are online and idle
+    const { data: matchingSkills } = await supabase
+      .from("agent_skills")
+      .select("agent_id, skill")
+      .in("skill", reqSkills);
+
+    if (matchingSkills && matchingSkills.length > 0) {
+      const candidateIds = [...new Set(matchingSkills.map((s) => s.agent_id))];
+
+      // Find an online agent not currently busy
+      const { data: idleAgents } = await supabase
+        .from("agents")
+        .select("id")
+        .eq("workspace_id", auth.workspaceId)
+        .eq("status", "online")
+        .in("id", candidateIds)
+        .limit(1);
+
+      if (idleAgents && idleAgents.length > 0) {
+        // Check agent doesn't have too many in-progress tasks
+        const agentId = idleAgents[0].id;
+        const { count: activeCount } = await supabase
+          .from("task_queue")
+          .select("*", { count: "exact", head: true })
+          .eq("assigned_agent_id", agentId)
+          .eq("status", "in-progress");
+
+        if ((activeCount ?? 0) === 0) {
+          const now = new Date().toISOString();
+          await supabase
+            .from("task_queue")
+            .update({ status: "in-progress", assigned_agent_id: agentId, claimed_at: now })
+            .eq("id", task.id);
+          autoAssigned = true;
+        }
+      }
+    }
+  }
+
   return apiSuccess(
     {
       task_id: task.id,
-      status: task.status,
-      position_in_queue: 0, // TODO: calculate actual position
-      estimated_assignment: "< 1 min",
+      status: autoAssigned ? "in-progress" : task.status,
+      position_in_queue: autoAssigned ? 0 : position,
+      estimated_assignment: autoAssigned ? "auto-assigned" : "< 1 min",
       created_at: task.created_at,
     },
     201

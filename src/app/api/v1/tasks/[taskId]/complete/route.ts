@@ -14,37 +14,62 @@ export async function POST(
   let body;
   try { body = await req.json(); } catch { return apiError("validation_error", "Invalid JSON body"); }
 
+  if (!body.agent_id) {
+    return apiError("validation_error", "agent_id is required");
+  }
+
   const supabase = getServiceClient();
 
-  // TODO Week 2: Full implementation with approval flow & notifications
   const { data: task } = await supabase
     .from("task_queue")
-    .select("id, needs_approval")
+    .select("id, needs_approval, assigned_agent_id, claimed_at, status")
     .eq("id", taskId)
     .eq("workspace_id", auth.workspaceId)
     .single();
 
   if (!task) return apiError("task_not_found", "Task not found", 404);
 
-  const newStatus = task.needs_approval ? "pending-approval" : "completed";
+  if (task.assigned_agent_id !== body.agent_id) {
+    return apiError("validation_error", "Only the assigned agent can complete this task", 403);
+  }
+
   const now = new Date().toISOString();
+  const newStatus = task.needs_approval ? "pending-approval" : "completed";
+
+  // Calculate duration
+  let durationMs = body.duration_ms || null;
+  if (!durationMs && task.claimed_at) {
+    durationMs = new Date(now).getTime() - new Date(task.claimed_at).getTime();
+  }
 
   await supabase
     .from("task_queue")
     .update({
       status: newStatus,
       output: body.output || {},
-      duration_ms: body.duration_ms || null,
+      duration_ms: durationMs,
       completed_at: now,
       progress_percent: 100,
       approval_status: task.needs_approval ? "pending" : null,
+      updated_at: now,
     })
     .eq("id", taskId);
+
+  // Get approval queue position
+  let approvalQueuePosition = null;
+  if (task.needs_approval) {
+    const { count } = await supabase
+      .from("task_queue")
+      .select("*", { count: "exact", head: true })
+      .eq("workspace_id", auth.workspaceId)
+      .eq("status", "pending-approval");
+    approvalQueuePosition = count ?? 1;
+  }
 
   return apiSuccess({
     task_id: taskId,
     status: newStatus,
-    approval_queue_position: task.needs_approval ? 1 : null,
-    notification_sent: false, // TODO: implement notifications
+    approval_queue_position: approvalQueuePosition,
+    notification_sent: false,
   });
 }

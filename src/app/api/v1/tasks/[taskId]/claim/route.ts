@@ -20,24 +20,56 @@ export async function POST(
 
   const supabase = getServiceClient();
 
-  // TODO Week 2: Atomic claim with proper locking
-  const { data: task } = await supabase
-    .from("task_queue")
-    .select("id, status, assigned_agent_id")
-    .eq("id", taskId)
+  // Validate agent belongs to workspace
+  const { data: agent } = await supabase
+    .from("agents")
+    .select("id, name")
+    .eq("id", body.agent_id)
     .eq("workspace_id", auth.workspaceId)
     .single();
 
-  if (!task) return apiError("task_not_found", "Task not found", 404);
-  if (task.status !== "queued") {
-    return apiError("task_already_claimed", "Task is already claimed", 409);
+  if (!agent) {
+    return apiError("validation_error", "Agent not found in this workspace", 400);
   }
 
+  // Atomic claim: update only if status is still 'queued'
   const now = new Date().toISOString();
-  await supabase
+  const { data: claimed, error } = await supabase
     .from("task_queue")
-    .update({ status: "in-progress", assigned_agent_id: body.agent_id, claimed_at: now })
-    .eq("id", taskId);
+    .update({
+      status: "in-progress",
+      assigned_agent_id: body.agent_id,
+      claimed_at: now,
+    })
+    .eq("id", taskId)
+    .eq("workspace_id", auth.workspaceId)
+    .eq("status", "queued")
+    .select("id, status, assigned_agent_id")
+    .maybeSingle();
 
-  return apiSuccess({ task_id: taskId, status: "in-progress", claimed_by: body.agent_id, claimed_at: now });
+  if (error) {
+    return apiError("internal_error", "Failed to claim task", 500);
+  }
+
+  if (!claimed) {
+    // Check if task exists at all
+    const { data: existing } = await supabase
+      .from("task_queue")
+      .select("id, status, assigned_agent_id")
+      .eq("id", taskId)
+      .eq("workspace_id", auth.workspaceId)
+      .single();
+
+    if (!existing) {
+      return apiError("task_not_found", "Task not found", 404);
+    }
+    return apiError("task_already_claimed", "Task is already claimed or not in queued state", 409);
+  }
+
+  return apiSuccess({
+    task_id: taskId,
+    status: "in-progress",
+    claimed_by: body.agent_id,
+    claimed_at: now,
+  });
 }

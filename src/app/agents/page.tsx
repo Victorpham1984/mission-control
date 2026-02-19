@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useWorkspaceData } from "@/lib/supabase/hooks";
+import { useWorkspaceData, useAgentHeartbeats } from "@/lib/supabase/hooks";
 import AgentProfileModal from "@/components/AgentProfileModal";
 import Header from "@/components/Header";
 import type { Agent } from "@/lib/data";
@@ -9,9 +9,12 @@ const badgeClass: Record<string, string> = { lead: "bg-amber-500 text-black", sp
 const badgeLabel: Record<string, string> = { lead: "Lead", spc: "Specialist", int: "Integrator", founder: "Founder" };
 const statusDot: Record<string, string> = { working: "bg-green-400 shadow-[0_0_6px_#4ade80]", idle: "bg-slate-400", error: "bg-red-400 shadow-[0_0_6px_#f87171]" };
 const statusLabel: Record<string, string> = { working: "Working", idle: "Idle", error: "Error" };
+const heartbeatDot: Record<string, string> = { online: "🟢", away: "🟡", offline: "🔴" };
+const heartbeatLabel: Record<string, string> = { online: "Online", away: "Away", offline: "Offline" };
 
 export default function AgentsPage() {
   const { agents, dbAgents, tasks, loading } = useWorkspaceData();
+  const { heartbeats } = useAgentHeartbeats();
   const [profileAgent, setProfileAgent] = useState<Agent | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
@@ -78,8 +81,25 @@ export default function AgentsPage() {
                     <div className="flex items-center gap-4 text-xs text-[var(--text-dim)]">
                       <span>{agentTasks.length} tasks</span>
                       <span>{activeTasks} active</span>
-                      <span className="ml-auto capitalize">{statusLabel[a.status]}</span>
+                      <span className="ml-auto flex items-center gap-1">
+                        {(() => {
+                          const hb = heartbeats.get(a.id);
+                          const hbStatus = hb?.status || "offline";
+                          return (
+                            <>
+                              <span>{heartbeatDot[hbStatus]}</span>
+                              <span>{heartbeatLabel[hbStatus]}</span>
+                            </>
+                          );
+                        })()}
+                      </span>
                     </div>
+                    {(() => {
+                      const hb = heartbeats.get(a.id);
+                      return hb?.status_message ? (
+                        <div className="text-[10px] text-blue-400 mt-1 truncate">💬 {hb.status_message}</div>
+                      ) : null;
+                    })()}
                   </div>
                 );
               })}

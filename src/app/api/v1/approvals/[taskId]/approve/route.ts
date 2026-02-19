@@ -16,7 +16,24 @@ export async function POST(
 
   const supabase = getServiceClient();
 
-  // TODO Week 3: Full approval with notifications
+  // Verify task is pending approval
+  const { data: task } = await supabase
+    .from("task_queue")
+    .select("id, status, approval_status")
+    .eq("id", taskId)
+    .eq("workspace_id", auth.workspaceId)
+    .single();
+
+  if (!task) return apiError("task_not_found", "Task not found", 404);
+  if (task.status !== "pending-approval") {
+    return apiError("validation_error", "Task is not pending approval");
+  }
+
+  // Validate rating
+  if (body.rating !== undefined && (body.rating < 1 || body.rating > 5)) {
+    return apiError("validation_error", "Rating must be between 1 and 5");
+  }
+
   const now = new Date().toISOString();
   await supabase
     .from("task_queue")
@@ -26,9 +43,14 @@ export async function POST(
       approval_rating: body.rating || null,
       approval_feedback: body.comment || null,
       approved_at: now,
+      updated_at: now,
     })
-    .eq("id", taskId)
-    .eq("workspace_id", auth.workspaceId);
+    .eq("id", taskId);
 
-  return apiSuccess({ task_id: taskId, status: "completed", approved_at: now });
+  return apiSuccess({
+    task_id: taskId,
+    status: "completed",
+    approval_status: "approved",
+    approved_at: now,
+  });
 }

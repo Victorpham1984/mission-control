@@ -23,6 +23,11 @@ export async function PATCH(
     return apiError("validation_error", "status is required");
   }
 
+  const validStatuses = ["online", "offline", "error", "paused"];
+  if (!validStatuses.includes(body.status)) {
+    return apiError("validation_error", `status must be one of: ${validStatuses.join(", ")}`);
+  }
+
   const supabase = getServiceClient();
 
   // Verify agent belongs to workspace
