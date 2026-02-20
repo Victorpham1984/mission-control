@@ -11,7 +11,8 @@ export function getServiceClient() {
 
 export interface AuthContext {
   workspaceId: string;
-  apiKeyId: string;
+  apiKeyId?: string;
+  userId?: string;
 }
 
 /**
@@ -64,5 +65,110 @@ export async function authenticateRequest(
   return {
     workspaceId: keyRow.workspace_id,
     apiKeyId: keyRow.id,
+  };
+}
+
+/**
+ * Authenticate either via API key OR user session.
+ * Supports both agents (API key) and humans (browser session).
+ * Returns workspace context or an error Response.
+ */
+export async function authenticateUserOrApiKey(
+  req: NextRequest
+): Promise<AuthContext | Response> {
+  const supabase = getServiceClient();
+  
+  // First, try API key auth (for agents)
+  const authHeader = req.headers.get("authorization");
+  if (authHeader?.startsWith("Bearer ")) {
+    const apiKey = authHeader.slice(7);
+    if (apiKey) {
+      // Hash and lookup API key
+      const encoder = new TextEncoder();
+      const data = encoder.encode(apiKey);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+      const keyHash = Array.from(new Uint8Array(hashBuffer))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+
+      const { data: keyRow, error } = await supabase
+        .from("workspace_api_keys")
+        .select("id, workspace_id, is_active")
+        .eq("key_hash", keyHash)
+        .single();
+
+      if (!error && keyRow && keyRow.is_active) {
+        // Valid API key
+        supabase
+          .from("workspace_api_keys")
+          .update({ last_used_at: new Date().toISOString() })
+          .eq("id", keyRow.id)
+          .then();
+
+        return {
+          workspaceId: keyRow.workspace_id,
+          apiKeyId: keyRow.id,
+        };
+      }
+    }
+  }
+
+  // If API key failed/missing, try user session (for UI)
+  // Extract session token from cookie
+  const cookieHeader = req.headers.get("cookie");
+  if (!cookieHeader) {
+    return apiError("unauthorized", "No authentication provided", 401);
+  }
+
+  // Parse cookies to get Supabase session tokens
+  const cookies = Object.fromEntries(
+    cookieHeader.split(";").map((c) => {
+      const [key, ...val] = c.trim().split("=");
+      return [key, val.join("=")];
+    })
+  );
+
+  // Supabase stores auth in sb-<project-ref>-auth-token
+  const authCookieKey = Object.keys(cookies).find((k) =>
+    k.startsWith("sb-") && k.endsWith("-auth-token")
+  );
+
+  if (!authCookieKey) {
+    return apiError("unauthorized", "No session found", 401);
+  }
+
+  let sessionData;
+  try {
+    sessionData = JSON.parse(decodeURIComponent(cookies[authCookieKey]));
+  } catch {
+    return apiError("unauthorized", "Invalid session", 401);
+  }
+
+  const accessToken = sessionData?.access_token || sessionData?.[0];
+  if (!accessToken) {
+    return apiError("unauthorized", "No access token in session", 401);
+  }
+
+  // Verify token with Supabase
+  const { data: { user }, error: userError } = await supabase.auth.getUser(accessToken);
+  if (userError || !user) {
+    return apiError("unauthorized", "Invalid or expired session", 401);
+  }
+
+  // Get workspace from user's profile
+  const { data: workspace } = await supabase
+    .from("workspaces")
+    .select("id")
+    .eq("owner_id", user.id)
+    .limit(1)
+    .single();
+
+  if (!workspace) {
+    return apiError("unauthorized", "No workspace found for user", 404);
+  }
+
+  return {
+    workspaceId: workspace.id,
+    userId: user.id,
   };
 }
