@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { authenticateRequest, getServiceClient } from "@/lib/api/auth";
+import { authenticateUserOrApiKey, getServiceClient } from "@/lib/api/auth";
 import { apiError, apiSuccess } from "@/lib/api/errors";
 
 // POST /api/v1/approvals/:taskId/reject
@@ -7,7 +7,7 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ taskId: string }> }
 ) {
-  const auth = await authenticateRequest(req);
+  const auth = await authenticateUserOrApiKey(req);
   if (auth instanceof Response) return auth;
 
   const { taskId } = await params;
@@ -35,6 +35,7 @@ export async function POST(
   const updateData: Record<string, unknown> = {
     approval_status: "rejected",
     approval_feedback: body.feedback || null,
+    approved_by: auth.userId || null,
     updated_at: now,
   };
 

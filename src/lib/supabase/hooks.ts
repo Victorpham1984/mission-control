@@ -232,27 +232,35 @@ export function useTaskQueue() {
   };
 
   const approveTask = async (taskId: string, rating: number, comment?: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    await supabase.from("task_queue").update({
-      approval_status: "approved",
-      status: "completed",
-      approval_rating: rating,
-      approval_feedback: comment || null,
-      approved_by: user?.id || null,
-      approved_at: new Date().toISOString(),
-    }).eq("id", taskId);
+    const response = await fetch(`/api/v1/approvals/${taskId}/approve`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ rating, comment }),
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Failed to approve task");
+    }
+    
+    return response.json();
   };
 
   const rejectTask = async (taskId: string, feedback: string, action: "revise" | "reassign" | "cancel") => {
-    const { data: { user } } = await supabase.auth.getUser();
-    const newStatus = action === "cancel" ? "failed" : "queued";
-    await supabase.from("task_queue").update({
-      approval_status: "rejected",
-      status: newStatus,
-      approval_feedback: feedback,
-      approved_by: user?.id || null,
-      approved_at: new Date().toISOString(),
-    }).eq("id", taskId);
+    const response = await fetch(`/api/v1/approvals/${taskId}/reject`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ feedback, action }),
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Failed to reject task");
+    }
+    
+    return response.json();
   };
 
   return {
