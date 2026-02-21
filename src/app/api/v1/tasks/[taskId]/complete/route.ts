@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { authenticateRequest, getServiceClient } from "@/lib/api/auth";
 import { apiError, apiSuccess } from "@/lib/api/errors";
+import { NotificationService } from "@/lib/notifications";
 
 // POST /api/v1/tasks/:taskId/complete
 export async function POST(
@@ -70,10 +71,21 @@ export async function POST(
     approvalQueuePosition = count ?? 1;
   }
 
+  // Send notification
+  let notificationSent = false;
+  try {
+    const notificationService = new NotificationService(supabase);
+    const event = newStatus === "pending-approval" ? "pending_approval" : "completed";
+    const result = await notificationService.notifyTaskEvent(taskId, event, auth.workspaceId);
+    notificationSent = result.success;
+  } catch {
+    // Non-blocking: notification failure should not fail the complete endpoint
+  }
+
   return apiSuccess({
     task_id: taskId,
     status: newStatus,
     approval_queue_position: approvalQueuePosition,
-    notification_sent: false,
+    notification_sent: notificationSent,
   });
 }
