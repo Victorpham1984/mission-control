@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useTaskQueue, type TaskQueueItem } from "@/lib/supabase/hooks";
 
 function formatTime(iso: string | null): string {
@@ -112,6 +113,7 @@ function RejectModal({ task, onReject, onClose }: { task: TaskQueueItem; onRejec
 }
 
 export default function OutcomeDashboard() {
+  const router = useRouter();
   const { pendingApprovals, activeTasks, completedTasks, queuedTasks, metrics, loading, approveTask, rejectTask } = useTaskQueue();
   const [approveTarget, setApproveTarget] = useState<TaskQueueItem | null>(null);
   const [rejectTarget, setRejectTarget] = useState<TaskQueueItem | null>(null);
@@ -158,13 +160,31 @@ export default function OutcomeDashboard() {
         ))}
       </div>
 
+      {/* Pending Approvals Widget */}
+      {pendingApprovals.length > 0 && (
+        <div onClick={() => router.push("/dashboard/approvals")}
+          className="bg-amber-500/10 rounded-xl p-4 border border-amber-500/30 cursor-pointer hover:bg-amber-500/15 transition flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">⏳</span>
+            <div>
+              <div className="font-semibold text-sm">Pending Approvals</div>
+              <div className="text-xs text-amber-400">{pendingApprovals.length} task{pendingApprovals.length !== 1 ? "s" : ""} waiting for your review</div>
+            </div>
+          </div>
+          <span className="text-[var(--accent)] text-sm">Review →</span>
+        </div>
+      )}
+
       {/* Approval Queue */}
       {pendingApprovals.length > 0 && (
         <section>
-          <h2 className="text-sm font-bold uppercase tracking-wider text-amber-400 mb-3 flex items-center gap-2">
-            <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
-            Approval Queue ({pendingApprovals.length})
-          </h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2">
+              <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
+              Approval Queue ({pendingApprovals.length})
+            </h2>
+            <button onClick={() => router.push("/dashboard/approvals")} className="text-xs text-[var(--accent)] hover:underline">View All →</button>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {pendingApprovals.map(t => (
               <div key={t.id} className="bg-[var(--card)] rounded-xl p-4 border border-amber-500/30 hover:border-amber-500/50 transition">
