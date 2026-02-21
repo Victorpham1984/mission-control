@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { authenticateRequest, getServiceClient } from "@/lib/api/auth";
 import { apiError, apiSuccess } from "@/lib/api/errors";
 import { NotificationService } from "@/lib/notifications";
+import { dispatchWebhookEvent } from "@/lib/webhooks";
 
 // POST /api/v1/tasks/:taskId/complete
 export async function POST(
@@ -70,6 +71,20 @@ export async function POST(
       .eq("status", "pending-approval");
     approvalQueuePosition = count ?? 1;
   }
+
+  // Dispatch webhook
+  const webhookEvent = newStatus === "pending-approval" ? "task.pending_approval" as const : "task.completed" as const;
+  dispatchWebhookEvent(auth.workspaceId, webhookEvent, {
+    task_id: taskId,
+    title: "",
+    description: null,
+    priority: "",
+    required_skills: [],
+    status: newStatus,
+    assigned_agent_id: task.assigned_agent_id,
+    output: body.output || {},
+    duration_ms: durationMs,
+  });
 
   // Send notification
   let notificationSent = false;

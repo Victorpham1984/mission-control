@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { authenticateRequest, getServiceClient } from "@/lib/api/auth";
 import { apiError, apiSuccess } from "@/lib/api/errors";
+import { dispatchWebhookEvent } from "@/lib/webhooks";
 
 // POST /api/v1/tasks/:taskId/claim
 export async function POST(
@@ -65,6 +66,17 @@ export async function POST(
     }
     return apiError("task_already_claimed", "Task is already claimed or not in queued state", 409);
   }
+
+  // Dispatch webhook for task.assigned
+  dispatchWebhookEvent(auth.workspaceId, "task.assigned", {
+    task_id: taskId,
+    title: "",
+    description: null,
+    priority: "",
+    required_skills: [],
+    status: "in-progress",
+    assigned_agent_id: body.agent_id,
+  });
 
   return apiSuccess({
     task_id: taskId,
