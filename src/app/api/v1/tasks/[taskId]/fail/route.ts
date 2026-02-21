@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { authenticateRequest, getServiceClient } from "@/lib/api/auth";
 import { apiError, apiSuccess } from "@/lib/api/errors";
 import { logTaskEvent } from "@/lib/api/task-history";
+import { NotificationService } from "@/lib/notifications";
 
 // POST /api/v1/tasks/:taskId/fail
 export async function POST(
@@ -89,6 +90,16 @@ export async function POST(
     .from("task_queue")
     .update(updateData)
     .eq("id", taskId);
+
+  // Notify on permanent failure
+  if (newStatus === "failed_permanent") {
+    try {
+      const notificationService = new NotificationService(supabase);
+      await notificationService.notifyTaskEvent(taskId, "failed_permanent", auth.workspaceId);
+    } catch {
+      // Non-blocking
+    }
+  }
 
   return apiSuccess({
     task_id: taskId,
