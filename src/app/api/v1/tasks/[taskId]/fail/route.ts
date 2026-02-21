@@ -3,6 +3,7 @@ import { authenticateRequest, getServiceClient } from "@/lib/api/auth";
 import { apiError, apiSuccess } from "@/lib/api/errors";
 import { logTaskEvent } from "@/lib/api/task-history";
 import { NotificationService } from "@/lib/notifications";
+import { dispatchWebhookEvent } from "@/lib/webhooks";
 
 // POST /api/v1/tasks/:taskId/fail
 export async function POST(
@@ -90,6 +91,19 @@ export async function POST(
     .from("task_queue")
     .update(updateData)
     .eq("id", taskId);
+
+  // Dispatch webhook for task failure
+  dispatchWebhookEvent(auth.workspaceId, "task.failed", {
+    task_id: taskId,
+    title: "",
+    description: null,
+    priority: "",
+    required_skills: [],
+    status: newStatus,
+    assigned_agent_id: task.assigned_agent_id,
+    error: errorMsg,
+    retry_count: newRetryCount,
+  });
 
   // Notify on permanent failure
   if (newStatus === "failed_permanent") {

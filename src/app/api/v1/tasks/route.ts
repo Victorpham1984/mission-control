@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { authenticateRequest, getServiceClient } from "@/lib/api/auth";
 import { apiError, apiSuccess } from "@/lib/api/errors";
+import { dispatchWebhookEvent } from "@/lib/webhooks";
 
 // POST /api/v1/tasks — Create task
 export async function POST(req: NextRequest) {
@@ -95,6 +96,17 @@ export async function POST(req: NextRequest) {
       }
     }
   }
+
+  // Dispatch webhook for task.created
+  dispatchWebhookEvent(auth.workspaceId, "task.created", {
+    task_id: task.id,
+    title: body.title,
+    description: body.description || null,
+    priority: body.priority || "normal",
+    required_skills: body.required_skills || [],
+    status: autoAssigned ? "in-progress" : task.status,
+    assigned_agent_id: null,
+  });
 
   return apiSuccess(
     {
