@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { authenticateRequest, getServiceClient } from "@/lib/api/auth";
 import { apiError, apiSuccess } from "@/lib/api/errors";
+import { logTaskEvent } from "@/lib/api/task-history";
 
 // POST /api/v1/tasks/:taskId/fail
 export async function POST(
@@ -19,39 +20,60 @@ export async function POST(
   // Get current task
   const { data: task } = await supabase
     .from("task_queue")
-    .select("id, status, metadata, assigned_agent_id")
+    .select("id, status, metadata, assigned_agent_id, retry_count")
     .eq("id", taskId)
     .eq("workspace_id", auth.workspaceId)
     .single();
 
   if (!task) return apiError("task_not_found", "Task not found", 404);
 
-  // Track fail count in metadata
-  const metadata = (task.metadata as Record<string, unknown>) || {};
-  const failCount = ((metadata.fail_count as number) || 0) + 1;
-  metadata.fail_count = failCount;
+  if (!['in-progress', 'queued'].includes(task.status)) {
+    return apiError("validation_error", "Task must be in-progress or queued to fail", 400);
+  }
 
-  const retrySuggested = body.retry_suggested ?? false;
+  const currentRetryCount = (task.retry_count as number) || 0;
+  const newRetryCount = currentRetryCount + 1;
+  const errorMsg = body.error || "Unknown error";
+
+  // Log the failure event
+  await logTaskEvent(supabase, taskId, "failed", task.assigned_agent_id || "system", {
+    error: errorMsg,
+    retry_count: newRetryCount,
+    agent_id: task.assigned_agent_id,
+  });
+
   let newStatus: string;
   let action: string;
 
-  if (failCount >= 3) {
+  if (newRetryCount >= 3) {
     // Permanent failure after 3 attempts
-    newStatus = "failed";
+    newStatus = "failed_permanent";
     action = "permanently_failed";
-  } else if (retrySuggested) {
-    // Requeue for another attempt
-    newStatus = "queued";
-    action = "requeued";
+
+    await logTaskEvent(supabase, taskId, "permanently_failed", "system", {
+      total_retries: newRetryCount,
+      final_error: errorMsg,
+    });
   } else {
-    newStatus = "failed";
-    action = "failed";
+    // Auto-retry: requeue
+    newStatus = "queued";
+    action = "retried";
+
+    await logTaskEvent(supabase, taskId, "retried", "system", {
+      retry_attempt: newRetryCount,
+      previous_agent_id: task.assigned_agent_id,
+    });
   }
+
+  // Track fail count in metadata for backward compat
+  const metadata = (task.metadata as Record<string, unknown>) || {};
+  metadata.fail_count = newRetryCount;
 
   const updateData: Record<string, unknown> = {
     status: newStatus,
-    error: body.error || "Unknown error",
+    error: errorMsg,
     metadata,
+    retry_count: newRetryCount,
     updated_at: new Date().toISOString(),
   };
 
@@ -72,6 +94,8 @@ export async function POST(
     task_id: taskId,
     status: newStatus,
     action,
-    fail_count: failCount,
+    retry_count: newRetryCount,
+    max_retries: 3,
+    fail_count: newRetryCount,
   });
 }
