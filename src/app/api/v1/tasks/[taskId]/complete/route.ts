@@ -29,6 +29,10 @@ export async function POST(
 
   if (!task) return apiError("task_not_found", "Task not found", 404);
 
+  if (task.status !== 'in-progress') {
+    return apiError("validation_error", "Task must be in-progress to complete", 400);
+  }
+
   if (task.assigned_agent_id !== body.agent_id) {
     return apiError("validation_error", "Only the assigned agent can complete this task", 403);
   }

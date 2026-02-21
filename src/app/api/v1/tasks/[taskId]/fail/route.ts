@@ -27,6 +27,10 @@ export async function POST(
 
   if (!task) return apiError("task_not_found", "Task not found", 404);
 
+  if (!['in-progress', 'queued'].includes(task.status)) {
+    return apiError("validation_error", "Task must be in-progress or queued to fail", 400);
+  }
+
   const currentRetryCount = (task.retry_count as number) || 0;
   const newRetryCount = currentRetryCount + 1;
   const errorMsg = body.error || "Unknown error";
