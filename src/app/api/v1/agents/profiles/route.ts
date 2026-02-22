@@ -1,10 +1,10 @@
 import { NextRequest } from "next/server";
-import { authenticateRequest, getServiceClient } from "@/lib/api/auth";
+import { authenticateUserOrApiKey, getServiceClient } from "@/lib/api/auth";
 import { apiError, apiSuccess } from "@/lib/api/errors";
 
 // GET /api/v1/agents/profiles — List all agent profiles in workspace
 export async function GET(req: NextRequest) {
-  const auth = await authenticateRequest(req);
+  const auth = await authenticateUserOrApiKey(req);
   if (auth instanceof Response) return auth;
 
   const supabase = getServiceClient();
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
 
 // POST /api/v1/agents/profiles — Create agent profile
 export async function POST(req: NextRequest) {
-  const auth = await authenticateRequest(req);
+  const auth = await authenticateUserOrApiKey(req);
   if (auth instanceof Response) return auth;
 
   let body;
