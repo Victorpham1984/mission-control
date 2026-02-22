@@ -26,6 +26,7 @@ export default function NewAgentPage() {
       const externalId = name.toLowerCase().replace(/\s+/g, "-") + "-" + Date.now();
       const regRes = await fetch("/api/v1/agents/register", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name,
@@ -37,15 +38,17 @@ export default function NewAgentPage() {
       
       if (!regRes.ok) {
         const err = await regRes.json().catch(() => ({}));
-        throw new Error(err.error?.message || "Failed to register agent");
+        console.error("Register agent error:", err);
+        throw new Error(err.error?.message || err.message || "Failed to register agent");
       }
       
       const regData = await regRes.json();
       const agentId = regData.data?.agent_id;
 
       // Then create the agent profile
-      await fetch("/api/v1/agents/profiles", {
+      const profRes = await fetch("/api/v1/agents/profiles", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           agent_id: agentId,
@@ -56,6 +59,12 @@ export default function NewAgentPage() {
           expertise_areas: role ? [role] : [],
         }),
       });
+
+      if (!profRes.ok) {
+        const err = await profRes.json().catch(() => ({}));
+        console.error("Create profile error:", err);
+        throw new Error(err.error?.message || err.message || "Failed to create agent profile");
+      }
       
       router.push("/agents");
     } catch (err: unknown) {
