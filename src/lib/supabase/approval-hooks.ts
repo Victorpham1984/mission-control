@@ -101,7 +101,7 @@ export function useAgentMetrics(agentId: string) {
   } | null>(null);
   const [agent, setAgent] = useState<{
     id: string; name: string; avatar_emoji: string | null; skills: string[] | null;
-    role: string | null; about: string | null; type: string; status: string;
+    role: string | null; about: string | null; type: string; status: string; workspace_id: string;
   } | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -112,7 +112,7 @@ export function useAgentMetrics(agentId: string) {
     // Get agent
     const { data: a } = await supabase
       .from("agents")
-      .select("id, name, avatar_emoji, skills, role, about, type, status")
+      .select("id, name, avatar_emoji, skills, role, about, type, status, workspace_id")
       .eq("id", agentId)
       .eq("workspace_id", wsId)
       .single();
