@@ -63,7 +63,7 @@ export default function ChatPage() {
         schema: "public",
         table: "messages",
         filter: `workspace_id=eq.${workspaceId}`,
-      }, (payload) => {
+      }, (payload: { new: Message; old?: Message }) => {
         setMessages(prev => [...prev, payload.new as Message]);
       })
       .subscribe();
