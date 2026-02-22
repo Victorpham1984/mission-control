@@ -129,19 +129,42 @@ export async function authenticateUserOrApiKey(
   );
 
   // Supabase stores auth in sb-<project-ref>-auth-token
+  // Newer @supabase/ssr may chunk into .0, .1, .2 etc.
   const authCookieKey = Object.keys(cookies).find((k) =>
     k.startsWith("sb-") && k.endsWith("-auth-token")
   );
 
-  if (!authCookieKey) {
+  // Also check for chunked cookies (sb-xxx-auth-token.0, .1, etc.)
+  const chunkedKeys = Object.keys(cookies)
+    .filter((k) => /^sb-.*-auth-token\.\d+$/.test(k))
+    .sort((a, b) => {
+      const numA = parseInt(a.split(".").pop()!);
+      const numB = parseInt(b.split(".").pop()!);
+      return numA - numB;
+    });
+
+  let rawCookieValue: string | undefined;
+  if (chunkedKeys.length > 0) {
+    // Reassemble chunked cookie
+    rawCookieValue = chunkedKeys.map((k) => cookies[k]).join("");
+  } else if (authCookieKey) {
+    rawCookieValue = cookies[authCookieKey];
+  }
+
+  if (!rawCookieValue) {
     return apiError("unauthorized", "No session found", 401);
   }
 
   let sessionData;
   try {
-    sessionData = JSON.parse(decodeURIComponent(cookies[authCookieKey]));
+    sessionData = JSON.parse(decodeURIComponent(rawCookieValue));
   } catch {
-    return apiError("unauthorized", "Invalid session", 401);
+    // Try without decodeURIComponent (some formats are already decoded)
+    try {
+      sessionData = JSON.parse(rawCookieValue);
+    } catch {
+      return apiError("unauthorized", "Invalid session", 401);
+    }
   }
 
   const accessToken = sessionData?.access_token || sessionData?.[0];
