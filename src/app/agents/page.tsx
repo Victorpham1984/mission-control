@@ -59,20 +59,30 @@ export default function AgentsPage() {
               <h1 className="text-xl md:text-2xl font-bold">Agents</h1>
               <p className="text-sm text-[var(--text-dim)]">{agents.length} agents · {agents.filter(a => a.status === "working").length} active</p>
             </div>
-            <div className="flex gap-1.5">
-              {["all", "working", "idle", "error"].map(s => (
-                <button key={s} onClick={() => setStatusFilter(s)}
-                  className={`px-3 py-1.5 rounded-full text-xs border transition capitalize ${statusFilter === s ? "bg-[var(--accent)] text-black border-[var(--accent)] font-semibold" : "border-[var(--border)] text-[var(--text-dim)] hover:bg-[var(--card)]"}`}>
-                  {s === "all" ? "All" : statusLabel[s]}
-                </button>
-              ))}
+            <div className="flex items-center gap-3">
+              <div className="flex gap-1.5">
+                {["all", "working", "idle", "error"].map(s => (
+                  <button key={s} onClick={() => setStatusFilter(s)}
+                    className={`px-3 py-1.5 rounded-full text-xs border transition capitalize ${statusFilter === s ? "bg-[var(--accent)] text-black border-[var(--accent)] font-semibold" : "border-[var(--border)] text-[var(--text-dim)] hover:bg-[var(--card)]"}`}>
+                    {s === "all" ? "All" : statusLabel[s]}
+                  </button>
+                ))}
+              </div>
+              <button onClick={() => router.push("/agents/new")}
+                className="px-4 py-1.5 rounded-full text-xs font-semibold bg-[var(--accent)] text-black hover:brightness-110 transition flex items-center gap-1.5">
+                <span className="text-sm leading-none">+</span> Create Agent
+              </button>
             </div>
           </div>
 
           {filtered.length === 0 ? (
             <div className="text-center py-16 text-[var(--text-dim)]">
               <div className="text-4xl mb-3">🤖</div>
-              <p>No agents found</p>
+              <p className="mb-4">No agents found</p>
+              <button onClick={() => router.push("/agents/new")}
+                className="px-5 py-2.5 rounded-xl bg-[var(--accent)] text-black font-semibold text-sm hover:brightness-110 transition">
+                + Create Your First Agent
+              </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
