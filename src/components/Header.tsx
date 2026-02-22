@@ -12,6 +12,7 @@ const navItems = [
   { key: "/cron", label: "Cron", emoji: "⏰" },
   { key: "/hooks", label: "Hooks", emoji: "🪝" },
   { key: "/routing", label: "Routing", emoji: "🔀" },
+  { key: "/workspace/documents", label: "Workspace", emoji: "📄" },
   { key: "/settings", label: "Settings", emoji: "⚙️" },
 ];
 

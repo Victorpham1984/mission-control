@@ -1,8 +1,13 @@
 "use client";
-import { use } from "react";
+import { use, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAgentMetrics } from "@/lib/supabase/approval-hooks";
 import Header from "@/components/Header";
+import AgentProfileEditor from "@/components/agents/AgentProfileEditor";
+import AgentMemoryTimeline from "@/components/agents/AgentMemoryTimeline";
+import AgentPerformanceDashboard from "@/components/agents/AgentPerformanceDashboard";
+import AgentContextPreview from "@/components/agents/AgentContextPreview";
+import AgentLearningBadge from "@/components/agents/AgentLearningBadge";
 
 function formatDuration(ms: number): string {
   if (!ms) return "—";
@@ -60,6 +65,7 @@ export default function AgentDetailPage({ params }: { params: Promise<{ id: stri
   const { id } = use(params);
   const router = useRouter();
   const { agent, metrics, loading } = useAgentMetrics(id);
+  const [activeTab, setActiveTab] = useState<"overview" | "profile" | "performance" | "memory" | "context">("overview");
 
   if (loading) {
     return (
@@ -166,6 +172,33 @@ export default function AgentDetailPage({ params }: { params: Promise<{ id: stri
             </div>
           </div>
 
+          {/* Phase 2B Tabs */}
+          <div className="mb-6">
+            <div className="flex gap-1 bg-[var(--surface)] rounded-xl p-1 border border-[var(--border)]">
+              {(["overview", "profile", "performance", "memory", "context"] as const).map(tab => (
+                <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 px-3 py-2 rounded-lg text-sm capitalize transition ${activeTab === tab ? "bg-[var(--card)] text-white font-semibold border border-[var(--border)]" : "text-[var(--text-dim)] hover:text-white"}`}>{tab}</button>
+              ))}
+            </div>
+          </div>
+
+          {activeTab === "profile" && agent && (
+            <AgentProfileEditor agentId={id} workspaceId={agent.workspace_id} onSave={() => {}} />
+          )}
+
+          {activeTab === "performance" && agent && (
+            <AgentPerformanceDashboard workspaceId={agent.workspace_id} />
+          )}
+
+          {activeTab === "memory" && agent && (
+            <AgentMemoryTimeline workspaceId={agent.workspace_id} agentFilter={id} />
+          )}
+
+          {activeTab === "context" && agent && (
+            <AgentContextPreview agentId={id} workspaceId={agent.workspace_id} />
+          )}
+
+          {activeTab === "overview" && (
+            <>
           {/* Recent tasks */}
           <div className="bg-[var(--card)] rounded-xl border border-[var(--border)] overflow-hidden">
             <div className="px-4 py-3 border-b border-[var(--border)]">
@@ -191,6 +224,8 @@ export default function AgentDetailPage({ params }: { params: Promise<{ id: stri
               </div>
             )}
           </div>
+            </>
+          )}
         </div>
       </main>
     </div>
