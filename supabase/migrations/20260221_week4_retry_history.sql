@@ -24,10 +24,11 @@ CREATE TABLE IF NOT EXISTS public.task_history (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX idx_task_history_task ON public.task_history(task_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_task_history_task ON public.task_history(task_id, created_at DESC);
 
 ALTER TABLE public.task_history ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "workspace_owner_task_history" ON public.task_history;
 CREATE POLICY "workspace_owner_task_history" ON public.task_history
   FOR ALL USING (
     task_id IN (
