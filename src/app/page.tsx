@@ -56,7 +56,7 @@ export default function Home() {
   }, [agents, newAgent]);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(({ data: { user } }: { data: { user: any } }) => {
       if (user) {
         setUser({
           email: user.email,

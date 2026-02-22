@@ -24,7 +24,7 @@ export default function Header({ children }: { children?: React.ReactNode }) {
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(({ data: { user } }: { data: { user: any } }) => {
       if (user) {
         setUser({
           email: user.email,

@@ -40,7 +40,7 @@ export default function SquadChatModal({ onClose }: Props) {
     ]);
 
     const a = agentsRes.data || [];
-    a.forEach((agent, i) => { if (!colorMap.current.has(agent.id)) colorMap.current.set(agent.id, agentColors[i % agentColors.length]); });
+    a.forEach((agent: any, i: number) => { if (!colorMap.current.has(agent.id)) colorMap.current.set(agent.id, agentColors[i % agentColors.length]); });
     setAgents(a);
     setMessages(msgsRes.data || []);
     setLoading(false);
@@ -52,7 +52,7 @@ export default function SquadChatModal({ onClose }: Props) {
   useEffect(() => {
     const channel = supabase
       .channel("squad-chat-modal")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, (payload) => {
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, (payload: any) => {
         setMessages(prev => [...prev, payload.new as Message]);
       })
       .subscribe();

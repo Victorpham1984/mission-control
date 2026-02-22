@@ -23,7 +23,7 @@ export async function seedWorkspaceData(workspaceId: string) {
   }
 
   const agentMap: Record<string, string> = {};
-  agents.forEach(a => { agentMap[a.name] = a.id; });
+  agents.forEach((a: any) => { agentMap[a.name] = a.id; });
 
   // Create tasks
   const taskDefs = [

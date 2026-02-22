@@ -107,7 +107,7 @@ export function useWorkspaceData() {
     setDbAgents(rawAgents);
     setAgents(rawAgents.map(mapAgent));
     setTasks(rawTasks.map(mapTask));
-    setFeed(rawMessages.map(m => mapMessage(m, rawAgents)));
+    setFeed(rawMessages.map((m: any) => mapMessage(m, rawAgents)));
     setIsEmpty(rawAgents.length === 0 && rawTasks.length === 0);
     setLoading(false);
   }, []);
@@ -190,10 +190,10 @@ export function useTaskQueue() {
       .select("id, name, avatar_emoji")
       .eq("workspace_id", wsId);
 
-    const agentMap = new Map((agentsData || []).map(a => [a.id, a]));
+    const agentMap = new Map((agentsData || []).map((a: any) => [a.id, a]));
 
     const mapped: TaskQueueItem[] = (rawTasks || []).map((t: Record<string, unknown>) => {
-      const agent = t.assigned_agent_id ? agentMap.get(t.assigned_agent_id as string) : null;
+      const agent: any = t.assigned_agent_id ? agentMap.get(t.assigned_agent_id as string) : null;
       return {
         ...t,
         assigned_agent_name: agent?.name || undefined,
@@ -296,7 +296,7 @@ export function useAgentHeartbeats() {
 
     if (!agents) { setLoading(false); return; }
 
-    const agentIds = agents.map(a => a.id);
+    const agentIds = agents.map((a: any) => a.id);
     const { data: hbs } = await supabase
       .from("agent_heartbeats")
       .select("*")

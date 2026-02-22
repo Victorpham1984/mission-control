@@ -44,7 +44,7 @@ export default function TaskDetailModal({ task, agents, dbAgents, workspaceId, o
     if (!workspaceId) return;
     const channel = supabase
       .channel(`task-comments-${task.id}`)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "task_comments", filter: `task_id=eq.${task.id}` }, (payload) => {
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "task_comments", filter: `task_id=eq.${task.id}` }, (payload: any) => {
         setComments(prev => [...prev, payload.new as TaskComment]);
       })
       .subscribe();

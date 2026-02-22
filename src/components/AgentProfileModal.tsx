@@ -72,7 +72,7 @@ export default function AgentProfileModal({ agent, dbAgent, tasks, onClose, onOp
     if (!dbAgent) return;
     const channel = supabase
       .channel(`agent-msgs-${dbAgent.id}`)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: `agent_id=eq.${dbAgent.id}` }, (payload) => {
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: `agent_id=eq.${dbAgent.id}` }, (payload: any) => {
         setMessages(prev => [...prev, payload.new as Message]);
       })
       .subscribe();
