@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { authenticateRequest, getServiceClient } from "@/lib/api/auth";
+import { authenticateUserOrApiKey, getServiceClient } from "@/lib/api/auth";
 import { apiError, apiSuccess } from "@/lib/api/errors";
 
 interface RouteContext {
@@ -8,7 +8,7 @@ interface RouteContext {
 
 // GET /api/v1/agents/profiles/:agentId
 export async function GET(req: NextRequest, context: RouteContext) {
-  const auth = await authenticateRequest(req);
+  const auth = await authenticateUserOrApiKey(req);
   if (auth instanceof Response) return auth;
   const { agentId } = await context.params;
 
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
 
 // PATCH /api/v1/agents/profiles/:agentId
 export async function PATCH(req: NextRequest, context: RouteContext) {
-  const auth = await authenticateRequest(req);
+  const auth = await authenticateUserOrApiKey(req);
   if (auth instanceof Response) return auth;
   const { agentId } = await context.params;
 
@@ -79,7 +79,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
 
 // DELETE /api/v1/agents/profiles/:agentId
 export async function DELETE(req: NextRequest, context: RouteContext) {
-  const auth = await authenticateRequest(req);
+  const auth = await authenticateUserOrApiKey(req);
   if (auth instanceof Response) return auth;
   const { agentId } = await context.params;
 

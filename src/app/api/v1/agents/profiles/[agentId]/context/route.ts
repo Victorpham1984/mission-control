@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { authenticateRequest, getServiceClient } from "@/lib/api/auth";
+import { authenticateUserOrApiKey, getServiceClient } from "@/lib/api/auth";
 import { apiError, apiSuccess } from "@/lib/api/errors";
 
 interface RouteContext {
@@ -9,7 +9,7 @@ interface RouteContext {
 // GET /api/v1/agents/profiles/:agentId/context
 // Returns agent persona + relevant workspace docs + memory for prompt injection
 export async function GET(req: NextRequest, context: RouteContext) {
-  const auth = await authenticateRequest(req);
+  const auth = await authenticateUserOrApiKey(req);
   if (auth instanceof Response) return auth;
   const { agentId } = await context.params;
 
