@@ -38,14 +38,15 @@ export default function SignupPage() {
     }
   };
 
-  const handleGitHub = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: "github",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
-  };
+  // GitHub OAuth temporarily disabled - pending Supabase provider configuration
+  // const handleGitHub = async () => {
+  //   await supabase.auth.signInWithOAuth({
+  //     provider: "github",
+  //     options: {
+  //       redirectTo: `${window.location.origin}/auth/callback`,
+  //     },
+  //   });
+  // };
 
   if (success) {
     return (
@@ -179,6 +180,8 @@ export default function SignupPage() {
           </button>
         </form>
 
+        {/* GitHub OAuth temporarily disabled - pending Supabase provider configuration */}
+        {/* 
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full" style={{ borderTop: "1px solid var(--border)" }} />
@@ -207,6 +210,7 @@ export default function SignupPage() {
           </svg>
           Sign up with GitHub
         </button>
+        */}
 
         <p
           className="text-center mt-6 text-sm"
