@@ -20,6 +20,15 @@ export async function updateSession(request: NextRequest) {
     request,
   });
 
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  // Skip auth check if env vars not available (Edge runtime or build time)
+  if (!supabaseUrl || !supabaseKey) {
+    console.warn('[Supabase Middleware] Env vars missing, skipping auth check');
+    return supabaseResponse;
+  }
+
   const supabase = createServerClient(
     supabaseUrl,
     supabaseKey,
