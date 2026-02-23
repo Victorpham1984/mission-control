@@ -1,12 +1,31 @@
 import { createClient } from "@supabase/supabase-js";
+import { createServerClient } from "@supabase/ssr";
 import { NextRequest } from "next/server";
 import { apiError } from "./errors";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 export function getServiceClient() {
   return createClient(supabaseUrl, supabaseServiceKey);
+}
+
+/**
+ * Create a Supabase client that reads cookies from the NextRequest.
+ * This properly handles @supabase/ssr cookie formats (chunked, base64, etc.)
+ */
+function createRequestClient(req: NextRequest) {
+  return createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return req.cookies.getAll();
+      },
+      setAll() {
+        // API routes don't need to set cookies
+      },
+    },
+  });
 }
 
 export interface AuthContext {
@@ -114,71 +133,15 @@ export async function authenticateUserOrApiKey(
   }
 
   // If API key failed/missing, try user session (for UI)
-  // Extract session token from cookie
-  const cookieHeader = req.headers.get("cookie");
-  if (!cookieHeader) {
-    return apiError("unauthorized", "No authentication provided", 401);
-  }
-
-  // Parse cookies to get Supabase session tokens
-  const cookies = Object.fromEntries(
-    cookieHeader.split(";").map((c) => {
-      const [key, ...val] = c.trim().split("=");
-      return [key, val.join("=")];
-    })
-  );
-
-  // Supabase stores auth in sb-<project-ref>-auth-token
-  // Newer @supabase/ssr may chunk into .0, .1, .2 etc.
-  const authCookieKey = Object.keys(cookies).find((k) =>
-    k.startsWith("sb-") && k.endsWith("-auth-token")
-  );
-
-  // Also check for chunked cookies (sb-xxx-auth-token.0, .1, etc.)
-  const chunkedKeys = Object.keys(cookies)
-    .filter((k) => /^sb-.*-auth-token\.\d+$/.test(k))
-    .sort((a, b) => {
-      const numA = parseInt(a.split(".").pop()!);
-      const numB = parseInt(b.split(".").pop()!);
-      return numA - numB;
-    });
-
-  let rawCookieValue: string | undefined;
-  if (chunkedKeys.length > 0) {
-    // Reassemble chunked cookie
-    rawCookieValue = chunkedKeys.map((k) => cookies[k]).join("");
-  } else if (authCookieKey) {
-    rawCookieValue = cookies[authCookieKey];
-  }
-
-  if (!rawCookieValue) {
-    return apiError("unauthorized", "No session found", 401);
-  }
-
-  let sessionData;
-  try {
-    sessionData = JSON.parse(decodeURIComponent(rawCookieValue));
-  } catch {
-    // Try without decodeURIComponent (some formats are already decoded)
-    try {
-      sessionData = JSON.parse(rawCookieValue);
-    } catch {
-      return apiError("unauthorized", "Invalid session", 401);
-    }
-  }
-
-  const accessToken = sessionData?.access_token || sessionData?.[0];
-  if (!accessToken) {
-    return apiError("unauthorized", "No access token in session", 401);
-  }
-
-  // Verify token with Supabase
-  const { data: { user }, error: userError } = await supabase.auth.getUser(accessToken);
+  // Use @supabase/ssr to properly read session from cookies
+  const requestClient = createRequestClient(req);
+  
+  const { data: { user }, error: userError } = await requestClient.auth.getUser();
   if (userError || !user) {
     return apiError("unauthorized", "Invalid or expired session", 401);
   }
 
-  // Get workspace from user's profile
+  // Get workspace from user's profile (use service client for RLS bypass)
   const { data: workspace } = await supabase
     .from("workspaces")
     .select("id")
