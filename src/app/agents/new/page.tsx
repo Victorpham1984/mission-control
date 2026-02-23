@@ -43,7 +43,7 @@ export default function NewAgentPage() {
       }
       
       const regData = await regRes.json();
-      const agentId = regData.data?.agent_id;
+      const agentId = regData.agent_id;
 
       // Then create the agent profile
       const profRes = await fetch("/api/v1/agents/profiles", {
