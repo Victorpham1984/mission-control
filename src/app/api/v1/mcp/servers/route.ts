@@ -1,14 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
+// Helper: get user's workspace (owner-based, no workspace_members needed)
+async function getUserWorkspaceId(supabase: ReturnType<typeof createClient> extends Promise<infer T> ? T : never, userId: string): Promise<string | null> {
+  // Try workspace_members first
+  const { data: member } = await supabase
+    .from('workspace_members')
+    .select('workspace_id')
+    .eq('user_id', userId)
+    .single();
+  if (member) return member.workspace_id;
+
+  // Fallback: check workspaces.owner_id
+  const { data: workspace } = await supabase
+    .from('workspaces')
+    .select('id')
+    .eq('owner_id', userId)
+    .limit(1)
+    .single();
+  if (workspace) return workspace.id;
+
+  return null;
+}
+
 export async function GET() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+  const workspaceId = await getUserWorkspaceId(supabase, user.id);
+  if (!workspaceId) {
+    // No workspace at all — return empty list instead of error
+    return NextResponse.json({ servers: [] });
+  }
+
   const { data, error } = await supabase
     .from('mcp_servers')
     .select('*')
+    .eq('workspace_id', workspaceId)
     .order('created_at', { ascending: false });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -27,21 +56,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'name and transport are required' }, { status: 400 });
   }
 
-  // Get user's workspace
-  const { data: member } = await supabase
-    .from('workspace_members')
-    .select('workspace_id')
-    .eq('user_id', user.id)
-    .single();
-
-  if (!member) {
-    return NextResponse.json({ error: 'No workspace found' }, { status: 404 });
+  const workspaceId = await getUserWorkspaceId(supabase, user.id);
+  if (!workspaceId) {
+    return NextResponse.json({ error: 'No workspace found. Please create a workspace first.' }, { status: 404 });
   }
 
   const { data, error } = await supabase
     .from('mcp_servers')
     .insert({
-      workspace_id: member.workspace_id,
+      workspace_id: workspaceId,
       name,
       description,
       transport,
@@ -67,14 +90,8 @@ export async function DELETE(req: NextRequest) {
   const id = searchParams.get('id');
   if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 });
 
-  // Get user's workspace for scoped delete
-  const { data: member } = await supabase
-    .from('workspace_members')
-    .select('workspace_id')
-    .eq('user_id', user.id)
-    .single();
-
-  if (!member) {
+  const workspaceId = await getUserWorkspaceId(supabase, user.id);
+  if (!workspaceId) {
     return NextResponse.json({ error: 'No workspace found' }, { status: 404 });
   }
 
@@ -82,7 +99,7 @@ export async function DELETE(req: NextRequest) {
     .from('mcp_servers')
     .delete()
     .eq('id', id)
-    .eq('workspace_id', member.workspace_id)
+    .eq('workspace_id', workspaceId)
     .select();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
