@@ -67,7 +67,29 @@ export async function DELETE(req: NextRequest) {
   const id = searchParams.get('id');
   if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 });
 
-  const { error } = await supabase.from('mcp_servers').delete().eq('id', id);
+  // Get user's workspace for scoped delete
+  const { data: member } = await supabase
+    .from('workspace_members')
+    .select('workspace_id')
+    .eq('user_id', user.id)
+    .single();
+
+  if (!member) {
+    return NextResponse.json({ error: 'No workspace found' }, { status: 404 });
+  }
+
+  const { data, error } = await supabase
+    .from('mcp_servers')
+    .delete()
+    .eq('id', id)
+    .eq('workspace_id', member.workspace_id)
+    .select();
+
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ success: true });
+
+  if (!data || data.length === 0) {
+    return NextResponse.json({ error: 'Server not found or access denied' }, { status: 404 });
+  }
+
+  return NextResponse.json({ success: true, deleted: data[0] });
 }
