@@ -86,3 +86,25 @@ export const updateKpiSchema = z
   .refine((data) => Object.keys(data).length > 0, {
     message: "At least one field must be provided",
   });
+
+// ============================================================
+// Installed Playbooks
+// ============================================================
+
+export const installPlaybookSchema = z.object({
+  company_id: z.string().uuid({ message: "company_id must be a valid UUID" }),
+  customization: z.record(z.string(), z.unknown()).default({}),
+  schedule: z.string().nullable().default(null),
+  active: z.boolean().default(true),
+});
+
+export const updateInstalledPlaybookSchema = z
+  .object({
+    customization: z.record(z.string(), z.unknown()),
+    schedule: z.string().nullable(),
+    active: z.boolean(),
+  })
+  .partial()
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field must be provided",
+  });

@@ -465,6 +465,65 @@ CREATE TABLE IF NOT EXISTS public.kpis (
 -- Indexes: idx_kpis_company, idx_kpis_company_category, idx_kpis_goal (partial)
 
 -- ============================================================
+-- BIZMATE PHASE 2: PLAYBOOKS (workflow templates — global marketplace)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.playbooks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  description TEXT,
+  category TEXT NOT NULL
+    CHECK (category IN ('ecommerce', 'content', 'b2b', 'operations', 'marketing')),
+  author_id UUID REFERENCES public.profiles(id),  -- NULL = system template
+  config JSONB NOT NULL DEFAULT '{}',
+  is_public BOOLEAN DEFAULT false,
+  install_count INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+-- RLS: public_read_playbooks (is_public=true), author_manage_playbooks, service_role_playbooks
+-- Indexes: idx_playbooks_category, idx_playbooks_public (partial)
+-- Trigger: playbooks_updated_at → bizmate_set_updated_at()
+
+-- ============================================================
+-- BIZMATE PHASE 2: INSTALLED PLAYBOOKS (company-specific instances)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.installed_playbooks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+  playbook_id UUID NOT NULL REFERENCES public.playbooks(id) ON DELETE CASCADE,
+  customization JSONB DEFAULT '{}',
+  active BOOLEAN DEFAULT true,
+  schedule TEXT,
+  last_run_at TIMESTAMPTZ,
+  run_count INTEGER DEFAULT 0,
+  installed_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(company_id, playbook_id)
+);
+-- RLS: workspace_owner_installed_playbooks (via companies→workspaces), service_role_installed_playbooks
+-- Indexes: idx_installed_playbooks_company, idx_installed_playbooks_active
+-- Trigger: on_playbook_installed → increment_playbook_install_count()
+
+-- ============================================================
+-- BIZMATE PHASE 2: ACTIONS (business operations log — billing basis)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.actions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+  installed_playbook_id UUID REFERENCES public.installed_playbooks(id) ON DELETE SET NULL,
+  task_id UUID REFERENCES public.task_queue(id) ON DELETE SET NULL,
+  action_type TEXT NOT NULL,
+  description TEXT,
+  success BOOLEAN DEFAULT false,
+  evidence JSONB DEFAULT '{}',
+  cost DECIMAL DEFAULT 0,
+  duration_ms INTEGER,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+-- RLS: workspace_owner_actions (via companies→workspaces), service_role_actions
+-- Indexes: idx_actions_company_created (DESC), idx_actions_type, idx_actions_playbook (partial), idx_actions_task (partial)
+-- Note: append-only table (no updated_at)
+
+-- ============================================================
 -- KEY FUNCTIONS
 -- ============================================================
 -- handle_new_user()          — signup → creates profile + workspace
@@ -473,4 +532,5 @@ CREATE TABLE IF NOT EXISTS public.kpis (
 -- mark_offline_agents()      — cron: marks agents offline if no heartbeat in 5min
 -- match_documents()          — pgvector: semantic similarity search
 -- refresh_mcp_tool_stats()   — refresh materialized view
--- bizmate_set_updated_at()   — auto-update updated_at on companies/goals/kpis
+-- bizmate_set_updated_at()   — auto-update updated_at on companies/goals/kpis/playbooks
+-- increment_playbook_install_count() — auto-increment on installed_playbooks insert

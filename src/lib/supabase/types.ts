@@ -359,3 +359,46 @@ export type Kpi = {
   updated_at: string;
   created_at: string;
 };
+
+// ============================================================
+// BizMate — Business OS entities (Phase 2)
+// ============================================================
+
+export type Playbook = {
+  id: string;
+  name: string;
+  description: string | null;
+  category: "ecommerce" | "content" | "b2b" | "operations" | "marketing";
+  author_id: string | null;
+  config: Record<string, unknown>;
+  is_public: boolean;
+  install_count: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type InstalledPlaybook = {
+  id: string;
+  company_id: string;
+  playbook_id: string;
+  customization: Record<string, unknown>;
+  active: boolean;
+  schedule: string | null;
+  last_run_at: string | null;
+  run_count: number;
+  installed_at: string;
+};
+
+export type Action = {
+  id: string;
+  company_id: string;
+  installed_playbook_id: string | null;
+  task_id: string | null;
+  action_type: string;
+  description: string | null;
+  success: boolean;
+  evidence: Record<string, unknown>;
+  cost: number;
+  duration_ms: number | null;
+  created_at: string;
+};

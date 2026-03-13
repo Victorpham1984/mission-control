@@ -28,6 +28,9 @@ import type {
   Company,
   Goal,
   Kpi,
+  Playbook,
+  InstalledPlaybook,
+  Action,
 } from "@/lib/supabase/types";
 
 // ============================================================
@@ -247,7 +250,7 @@ describe("Critical path: register → task → approve", () => {
 // ============================================================
 
 describe("All types are exported and compile", () => {
-  it("exports 24 types matching 24 DB tables", () => {
+  it("exports 27 types matching 27 DB tables", () => {
     // This test passes if the file compiles — each type is imported above
     const typeNames: string[] = [
       "UserProfile",
@@ -275,8 +278,12 @@ describe("All types are exported and compile", () => {
       "Company",
       "Goal",
       "Kpi",
+      // BizMate Phase 2
+      "Playbook",
+      "InstalledPlaybook",
+      "Action",
     ];
-    expect(typeNames).toHaveLength(24);
+    expect(typeNames).toHaveLength(27);
   });
 
   it("Company has soft delete and icp_segment enum", () => {
@@ -330,5 +337,59 @@ describe("All types are exported and compile", () => {
     };
     expect(kpi.goal_id).toBeNull();
     expect(kpi.category).toBe("operations");
+  });
+
+  it("Playbook has category enum and marketplace fields", () => {
+    const playbook: Playbook = {
+      id: "uuid",
+      name: "Shopee Auto-Order",
+      description: "Tự động xử lý đơn hàng Shopee",
+      category: "ecommerce",
+      author_id: null,
+      config: { steps: [] },
+      is_public: true,
+      install_count: 0,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    expect(playbook.author_id).toBeNull();
+    expect(playbook.category).toBe("ecommerce");
+    expect(playbook.is_public).toBe(true);
+  });
+
+  it("InstalledPlaybook has schedule and run tracking", () => {
+    const installed: InstalledPlaybook = {
+      id: "uuid",
+      company_id: "uuid",
+      playbook_id: "uuid",
+      customization: {},
+      active: true,
+      schedule: "*/15 * * * *",
+      last_run_at: null,
+      run_count: 0,
+      installed_at: new Date().toISOString(),
+    };
+    expect(installed.active).toBe(true);
+    expect(installed.run_count).toBe(0);
+    expect(installed.last_run_at).toBeNull();
+  });
+
+  it("Action is append-only with cost and evidence", () => {
+    const action: Action = {
+      id: "uuid",
+      company_id: "uuid",
+      installed_playbook_id: "uuid",
+      task_id: null,
+      action_type: "pull_orders",
+      description: "Pulled 12 orders from Shopee",
+      success: true,
+      evidence: { order_count: 12 },
+      cost: 0.01,
+      duration_ms: 2300,
+      created_at: new Date().toISOString(),
+    };
+    expect(action.success).toBe(true);
+    expect(action.cost).toBe(0.01);
+    expect(action.task_id).toBeNull();
   });
 });
