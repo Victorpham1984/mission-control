@@ -9,10 +9,11 @@
 ## Nguyên tắc thiết kế
 
 1. **Lean schema** — 10-15 columns/table, dùng JSONB cho flexibility (tránh bloat kiểu Polsia 80+ columns)
-2. **Cascade deletes** — data integrity, xóa company → xóa hết data liên quan
+2. **Soft delete** — companies dùng `deleted_at` thay vì hard delete (giữ analytics data)
 3. **Reuse CommandMate tables** — auth (profiles), workspaces, agents, task_queue, MCP — giữ nguyên
 4. **Bridge qua `workspace_id`** — companies link tới workspaces, không duplicate auth/billing logic
 5. **RLS everywhere** — workspace-scoped isolation như CommandMate hiện tại
+6. **Encrypt secrets** — integration tokens PHẢI encrypt bằng pgcrypto
 
 ---
 
@@ -66,14 +67,16 @@ CREATE TABLE public.companies (
     CHECK (icp_segment IN ('creator', 'sme', 'agency')),
   currency TEXT DEFAULT 'VND',
   settings JSONB DEFAULT '{}',     -- timezone, language, preferences
+  deleted_at TIMESTAMPTZ DEFAULT NULL, -- Soft delete: NULL = active, timestamp = deleted
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now(),
-  UNIQUE(workspace_id)             -- 1 company per workspace
+  UNIQUE(workspace_id)             -- MVP decision: 1:1 company per workspace. Multi-company = Phase 4+
 );
 ```
 
 **Indexes:** `workspace_id` (unique)
-**RLS:** Workspace owner
+**RLS:** Workspace owner, filter `WHERE deleted_at IS NULL` trong tất cả queries
+**Soft delete:** `deleted_at IS NULL` = active. Avoid data loss, giữ analytics khi user "xóa" company.
 
 ---
 
@@ -209,7 +212,15 @@ CREATE TABLE public.actions (
 );
 ```
 
-**Indexes:** `company_id`, `(company_id, action_type)`, `(company_id, created_at DESC)`
+**Indexes (performance-critical — heavy read/write table):**
+```sql
+CREATE INDEX idx_actions_company_created ON actions(company_id, created_at DESC);
+CREATE INDEX idx_actions_type ON actions(company_id, action_type);
+CREATE INDEX idx_actions_playbook ON actions(installed_playbook_id)
+  WHERE installed_playbook_id IS NOT NULL;  -- Partial index: skip NULLs
+CREATE INDEX idx_actions_task ON actions(task_id)
+  WHERE task_id IS NOT NULL;
+```
 **RLS:** Workspace owner (via companies)
 
 ---
@@ -223,8 +234,8 @@ CREATE TABLE public.integrations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   company_id UUID NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
   platform TEXT NOT NULL,           -- 'shopee', 'lazada', 'tiktok', 'facebook', 'zalo_oa'
-  access_token TEXT NOT NULL,       -- Encrypted (Supabase Vault hoặc pgcrypto)
-  refresh_token TEXT,
+  access_token TEXT NOT NULL,       -- MUST encrypt: pgp_sym_encrypt(token, secret_key)
+  refresh_token TEXT,               -- MUST encrypt: same as access_token
   expires_at TIMESTAMPTZ,
   shop_id TEXT,                     -- Platform-specific shop/page ID
   metadata JSONB DEFAULT '{}',     -- Platform-specific config
@@ -236,7 +247,25 @@ CREATE TABLE public.integrations (
 
 **Indexes:** `company_id`, `(company_id, platform)` (unique)
 **RLS:** Workspace owner (via companies)
-**Security:** access_token PHẢI encrypt. Dùng Supabase Vault hoặc pgcrypto `pgp_sym_encrypt`.
+
+**Security — Token encryption (REQUIRED):**
+```sql
+-- Migration prerequisite:
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- Write: encrypt before storing
+INSERT INTO integrations (company_id, platform, access_token, refresh_token)
+VALUES (
+  $1, 'shopee',
+  pgp_sym_encrypt($2, current_setting('app.encryption_key')),
+  pgp_sym_encrypt($3, current_setting('app.encryption_key'))
+);
+
+-- Read: decrypt when reading
+SELECT pgp_sym_decrypt(access_token::bytea, current_setting('app.encryption_key')) AS access_token
+FROM integrations WHERE company_id = $1;
+```
+**Note:** `app.encryption_key` set via Supabase Dashboard → Settings → Database → Configuration. NEVER store in code.
 
 ---
 
@@ -254,6 +283,62 @@ CREATE TABLE public.integrations (
 
 ---
 
+## KPI Auto-Update Strategy
+
+KPIs tự động cập nhật khi actions xảy ra. 2 cơ chế:
+
+### 1. Trigger on actions INSERT (real-time)
+
+```sql
+-- Khi action mới được log → update KPI tương ứng
+CREATE OR REPLACE FUNCTION public.update_kpi_from_action()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- Update KPIs linked to this company where source = 'calculated'
+  UPDATE public.kpis
+  SET current_value = (
+    SELECT COUNT(*) FROM public.actions
+    WHERE company_id = NEW.company_id
+      AND success = true
+      AND action_type = kpis.name  -- KPI name maps to action_type
+      AND created_at >= date_trunc('month', now())
+  ),
+  updated_at = now()
+  WHERE company_id = NEW.company_id
+    AND source = 'calculated';
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER on_action_created_update_kpi
+  AFTER INSERT ON public.actions
+  FOR EACH ROW EXECUTE FUNCTION public.update_kpi_from_action();
+```
+
+### 2. Materialized view refresh (batch, mỗi 5 phút)
+
+```sql
+-- Dashboard summary view — refresh via pg_cron
+CREATE MATERIALIZED VIEW public.company_kpi_summary AS
+SELECT
+  c.id AS company_id,
+  COUNT(a.*) FILTER (WHERE a.success = true) AS total_successful_actions,
+  COUNT(a.*) FILTER (WHERE a.created_at >= date_trunc('month', now())) AS actions_this_month,
+  SUM(a.cost) FILTER (WHERE a.created_at >= date_trunc('month', now())) AS cost_this_month,
+  AVG(a.duration_ms) FILTER (WHERE a.success = true) AS avg_duration_ms
+FROM public.companies c
+LEFT JOIN public.actions a ON a.company_id = c.id
+WHERE c.deleted_at IS NULL
+GROUP BY c.id;
+
+-- Refresh every 5 minutes via pg_cron
+SELECT cron.schedule('refresh-kpi-summary', '*/5 * * * *',
+  'REFRESH MATERIALIZED VIEW CONCURRENTLY public.company_kpi_summary');
+```
+
+---
+
 ## Migration plan
 
 ```
@@ -268,8 +353,8 @@ Mỗi phase = 1 migration file trong `supabase/migrations/`.
 
 ## Open Questions
 
-1. [ ] `companies` 1:1 với `workspaces` — hay cho phép 1 workspace có nhiều companies?
-2. [ ] `playbooks.config` structure — cần finalize steps schema
-3. [ ] `integrations` — Shopee API access đã confirm chưa? OAuth flow nào?
+1. [x] ~~`companies` 1:1 với `workspaces`~~ → **Resolved: 1:1 cho MVP.** Multi-company = Phase 4+. UNIQUE constraint confirmed.
+2. [ ] `playbooks.config` structure — cần finalize steps schema (blocked by Blocker 1 in BLOCKERS.md)
+3. [ ] `integrations` — Shopee API access đã confirm chưa? OAuth flow nào? (blocked by Blocker 2 in BLOCKERS.md)
 4. [ ] Billing: track ở `actions.cost` hay tạo bảng `billing_events` riêng?
-5. [ ] KPI auto-update: trigger, cron job, hay calculated view?
+5. [x] ~~KPI auto-update~~ → **Resolved: Trigger on actions INSERT (real-time) + materialized view refresh (5min cron).** See section above.
