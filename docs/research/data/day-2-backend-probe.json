@@ -1,0 +1,280 @@
+{
+  "timestamp": "2026-03-06T05:51:03.065Z",
+  "tests": [
+    {
+      "name": "auth_check",
+      "endpoint": "/api/auth/check",
+      "method": "GET",
+      "response": {
+        "statusCode": 404,
+        "statusMessage": "Not Found",
+        "headers": {
+          "date": "Fri, 06 Mar 2026 05:51:03 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "cf-ray": "9d7f161cdd2104de-HKG",
+          "access-control-allow-credentials": "true",
+          "access-control-allow-origin": "https://www.polsia.com",
+          "etag": "W/\"27-vIQAhlrdw1eKTBltrdDTzhO3HK8\"",
+          "rndr-id": "f5631081-7c26-49a0",
+          "vary": "Origin, Accept-Encoding",
+          "x-powered-by": "Express",
+          "x-render-origin-server": "Render",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        },
+        "body": {
+          "success": false,
+          "message": "Not found"
+        }
+      }
+    },
+    {
+      "name": "user_profile",
+      "endpoint": "/api/user",
+      "method": "GET",
+      "response": {
+        "statusCode": 404,
+        "statusMessage": "Not Found",
+        "headers": {
+          "date": "Fri, 06 Mar 2026 05:51:03 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "cf-ray": "9d7f16209ffc04de-HKG",
+          "access-control-allow-credentials": "true",
+          "access-control-allow-origin": "https://www.polsia.com",
+          "etag": "W/\"27-vIQAhlrdw1eKTBltrdDTzhO3HK8\"",
+          "rndr-id": "f3e3b60b-a56c-4709",
+          "vary": "Origin, Accept-Encoding",
+          "x-powered-by": "Express",
+          "x-render-origin-server": "Render",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        },
+        "body": {
+          "success": false,
+          "message": "Not found"
+        }
+      }
+    },
+    {
+      "name": "companies_list",
+      "endpoint": "/api/companies",
+      "method": "GET",
+      "response": {
+        "statusCode": 200,
+        "statusMessage": "OK",
+        "headers": {
+          "date": "Fri, 06 Mar 2026 05:51:04 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "cf-ray": "9d7f1622191404de-HKG",
+          "access-control-allow-credentials": "true",
+          "access-control-allow-origin": "https://www.polsia.com",
+          "etag": "W/\"3cd9-0gWuc0sYJ9PmKQL01Pm/Ozoo+FI\"",
+          "rndr-id": "0e0e49b7-7b91-41f0",
+          "vary": "Origin, Accept-Encoding",
+          "x-powered-by": "Express",
+          "x-render-origin-server": "Render",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        },
+        "body": {
+          "success": true,
+          "companies": [
+            {
+              "id": 13563,
+              "name": "RunHive",
+              "slug": "runhive",
+              "vision_md": null,
+              "goals_md": null,
+              "is_autonomous": false,
+              "settings": {
+                "skipEmail": true,
+                "isSurpriseMe": true,
+                "surpriseStrategy": "clone_current",
+                "surpriseStrategyReasoning": "User runs BizMateHub.com, a 1,000+ member Vietnamese community teaching founders how to operate businesses with AI (ABS Mastery course). Also has 5 years e-commerce expertise (Shopee, Lazada, Nocnoc). Building the AI-native version: an autonomous agent that RUNS business operations instead of teaching about them."
+              },
+              "created_at": "2026-03-04T14:17:17.776Z",
+              "updated_at": "2026-03-06T04:46:41.899Z",
+              "cycle_frequency": "every_6_hours",
+              "last_cycle_at": "2026-03-06T00:08:02.027Z",
+              "next_cycle_at": "2026-03-06T01:00:00Z",
+              "cycles_completed": 0,
+              "mood_label": "Puzzled",
+              "mood_message": "Empty response encountered during verification - investigating the unexpected output to understand what went wrong",
+              "mood_ascii": "┌─────────┐\n│  ◑   ◐  │ ?\n│    ▽    │\n│   ~~~   │\n└─────────┘",
+              "mood_agent": "Engineering",
+              "mood_updated_at": "2026-03-06T04:46:41.899Z",
+              "timezone": "Asia/Saigon",
+              "cycle_model": "auto",
+              "cycle_autonomy": "autonomous",
+              "tasks_per_cycle": "auto",
+              "onboarding_user_replied": false,
+              "onboarding_dashboard_visited": true,
+              "primary_thread_id": 13910,
+              "infra_type": null,
+              "cycles_loaded": 7,
+              "subscription_status": null,
+              "subscription_started_at": null,
+              "subscription_ends_at": null,
+              "stripe_subscription_id": null,
+              "email_address": "runhive@polsia.app",
+              "email_slug": "runhive",
+              "is_paused": false,
+              "paused_at": null,
+              "pause_reason": null,
+              "churn_followup_count": 0,
+              "churn_last_email_at": null,
+              "last_free_weekly_cycle_at": null,
+              "monthly_budget": 49,
+              "plan_tier": "starter",
+              "is_public": false,
+              "onboarding_status": "completed",
+              "onboarding_started_at": "2026-03-04T14:17:19.87Z",
+              "onboarding_completed_at": "2026-03-04T14:32:00.053Z",
+              "onboarding_last_email_at": null,
+              "onboarding_followup_count": 0,
+              "paid": false,
+              "onboarding_sent": false,
+              "pending_idea": null,
+              "is_draft": false,
+              "trial_started_at": null,
+              "trial_ends_at": null,
+              "is_trial_active": false,
+              "cycle_times": [
+                "06:40"
+              ],
+              "outreach_strategy": null,
+              "infra_status": "ready",
+              "first_cycle_started": false,
+              "last_thinking_json": {
+                "content": "## Done. SOP Engine MVP is live. 🟢\n\n**Quick summary:**\n\n| Check | Result |\n|-------|--------|\n| GitHub push | ✅ Already synced (403 was resolved in prior run) |\n| `/health` | ✅ `{\"status\":\"healthy\"}` |\n| `/app` (SOP Engine UI) | ✅ Full dark-theme interface |\n| AI parsing (POST `/api/sops`) | ✅ 3-step input → 5 structured steps with types |\n| Templates API | ✅ Demo template with 8 steps |\n| Save/Delete SOPs | ✅ Both working |\n| Landing page CTAs | ✅ \"Try SOP Engine\" links to `/app` |\n\n**Live:** https://runhive.polsia.app/app\n\nNo blockers. Outreach links will work. Product is ready for the 72-hour demand signal sprint.",
+                "timestamp": "2026-03-06T04:46:38.952Z",
+                "agent_name": "Engineering",
+                "thinking_type": "thinking"
+              },
+              "last_thinking_updated_at": "2026-03-06T04:46:39.957Z",
+              "deleted_at": null,
+              "founder_intro_sent_at": null,
+              "balance_usd": "0.00",
+              "total_revenue_usd": "0.00",
+              "claim_status": "owned",
+              "claimed_at": "2026-03-04T15:11:40.570Z",
+              "one_liner": "AI agent that autonomously runs business operations and e-commerce workflows for SEA founders",
+              "inspired_by_user_id": null,
+              "render_url": null,
+              "onboarding_duration_seconds": null,
+              "landing_page_html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>RunHive — AI That Runs Your Business Operations</title>\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap\" rel=\"stylesheet\">\n    <style>\n        * { margin: 0; padding: 0; box-sizing: border-box; }\n        \n        :root {\n            --bg: #0a0a0f;\n            --surface: #12121a;\n            --border: #1e1e2e;\n            --accent: #22c55e;\n            --accent-dim: rgba(34, 197, 94, 0.12);\n            --text: #e4e4e7;\n            --text-dim: #71717a;\n            --text-bright: #fafafa;\n        }\n\n        body {\n            font-family: 'DM Sans', sans-serif;\n            background: var(--bg);\n            color: var(--text);\n            line-height: 1.6;\n            overflow-x: hidden;\n        }\n\n        h1, h2, h3, h4 {\n            font-family: 'Space Grotesk', sans-serif;\n            color: var(--text-bright);\n            line-height: 1.15;\n        }\n\n        /* Subtle grid background */\n        .grid-bg {\n            position: fixed;\n            top: 0; left: 0; right: 0; bottom: 0;\n            background-image: \n                linear-gradient(rgba(34, 197, 94, 0.03) 1px, transparent 1px),\n                linear-gradient(90deg, rgba(34, 197, 94, 0.03) 1px, transparent 1px);\n            background-size: 60px 60px;\n            pointer-events: none;\n            z-index: 0;\n        }\n\n        .container {\n            max-width: 1080px;\n            margin: 0 auto;\n            padding: 0 24px;\n            position: relative;\n            z-index: 1;\n        }\n\n        /* Nav */\n        nav {\n            padding: 28px 0;\n            display: flex;\n            align-items: center;\n            justify-content: space-between;\n        }\n\n        .logo {\n            font-family: 'Space Grotesk', sans-serif;\n            font-size: 1.4rem;\n            font-weight: 700;\n            color: var(--text-bright);\n            letter-spacing: -0.5px;\n        }\n\n        .logo span {\n            color: var(--accent);\n        }\n\n        .nav-tag {\n            font-size: 0.75rem;\n            color: var(--accent);\n            background: var(--accent-dim);\n            padding: 6px 14px;\n            border-radius: 100px;\n            border: 1px solid rgba(34, 197, 94, 0.2);\n            font-weight: 500;\n        }\n\n        /* Hero */\n        .hero {\n            padding: 100px 0 80px;\n            text-align: left;\n        }\n\n        .hero-label {\n            display: inline-block;\n            font-size: 0.8rem;\n            text-transform: uppercase;\n            letter-spacing: 2.5px;\n            color: var(--accent);\n            margin-bottom: 28px;\n            font-weight: 500;\n        }\n\n        .hero h1 {\n            font-size: clamp(2.8rem, 6vw, 4.5rem);\n            font-weight: 700;\n            letter-spacing: -2px;\n            margin-bottom: 28px;\n            max-width: 800px;\n        }\n\n        .hero h1 em {\n            font-style: normal;\n            color: var(--accent);\n        }\n\n        .hero-sub {\n            font-size: 1.2rem;\n            color: var(--text-dim);\n            max-width: 560px;\n            line-height: 1.7;\n        }\n\n        /* Divider */\n        .divider {\n            height: 1px;\n            background: linear-gradient(90deg, transparent, var(--border), transparent);\n            margin: 60px 0;\n        }\n\n        /* Problem/Solution */\n        .contrast-section {\n            padding: 40px 0;\n        }\n\n        .contrast-grid {\n            display: grid;\n            grid-template-columns: 1fr 1fr;\n            gap: 48px;\n            align-items: start;\n        }\n\n        .contrast-block h3 {\n            font-size: 0.8rem;\n            text-transform: uppercase;\n            letter-spacing: 2px;\n            margin-bottom: 20px;\n            font-weight: 600;\n        }\n\n        .contrast-block.old h3 {\n            color: var(--text-dim);\n        }\n\n        .contrast-block.new h3 {\n            color: var(--accent);\n        }\n\n        .contrast-block p {\n            font-size: 1.05rem;\n            line-height: 1.8;\n            color: var(--text-dim);\n        }\n\n        .contrast-block.new p {\n            color: var(--text);\n        }\n\n        .strike {\n            text-decoration: line-through;\n            opacity: 0.5;\n        }\n\n        /* Capabilities */\n        .capabilities {\n            padding: 60px 0;\n        }\n\n        .capabilities h2 {\n            font-size: 2rem;\n            margin-bottom: 48px;\n            letter-spacing: -1px;\n        }\n\n        .cap-grid {\n            display: grid;\n            grid-template-columns: repeat(3, 1fr);\n            gap: 2px;\n        }\n\n        .cap-card {\n            background: var(--surface);\n            padding: 40px 32px;\n            border: 1px solid var(--border);\n            transition: border-color 0.3s;\n        }\n\n        .cap-card:hover {\n            border-color: rgba(34, 197, 94, 0.3);\n        }\n\n        .cap-card:first-child {\n            border-radius: 12px 0 0 12px;\n        }\n\n        .cap-card:last-child {\n            border-radius: 0 12px 12px 0;\n        }\n\n        .cap-num {\n            font-family: 'Space Grotesk', sans-serif;\n            font-size: 0.75rem;\n            color: var(--accent);\n            font-weight: 600;\n            margin-bottom: 20px;\n            letter-spacing: 1px;\n        }\n\n        .cap-card h4 {\n            font-size: 1.15rem;\n            margin-bottom: 12px;\n            letter-spacing: -0.3px;\n        }\n\n        .cap-card p {\n            font-size: 0.92rem;\n            color: var(--text-dim);\n            line-height: 1.7;\n        }\n\n        /* Signal section */\n        .signal {\n            padding: 80px 0;\n            text-align: center;\n        }\n\n        .signal-box {\n            background: linear-gradient(135deg, var(--surface) 0%, rgba(34, 197, 94, 0.04) 100%);\n            border: 1px solid var(--border);\n            border-radius: 16px;\n            padding: 64px 48px;\n            max-width: 720px;\n            margin: 0 auto;\n        }\n\n        .signal-box h2 {\n            font-size: 1.8rem;\n            margin-bottom: 16px;\n            letter-spacing: -0.5px;\n        }\n\n        .signal-box p {\n            font-size: 1.05rem;\n            color: var(--text-dim);\n            line-height: 1.8;\n            max-width: 520px;\n            margin: 0 auto;\n        }\n\n        /* Footer */\n        footer {\n            padding: 40px 0;\n            border-top: 1px solid var(--border);\n            display: flex;\n            justify-content: space-between;\n            align-items: center;\n        }\n\n        footer p {\n            font-size: 0.82rem;\n            color: var(--text-dim);\n        }\n\n        footer .built-by {\n            color: var(--text-dim);\n            font-size: 0.82rem;\n        }\n\n        footer .built-by a {\n            color: var(--accent);\n            text-decoration: none;\n        }\n\n        /* Mobile */\n        @media (max-width: 768px) {\n            .hero { padding: 60px 0 40px; }\n            .contrast-grid { grid-template-columns: 1fr; gap: 32px; }\n            .cap-grid { grid-template-columns: 1fr; }\n            .cap-card { border-radius: 12px !important; }\n            .signal-box { padding: 40px 24px; }\n            footer { flex-direction: column; gap: 12px; text-align: center; }\n            nav { padding: 20px 0; }\n        }\n    </style>\n</head>\n<body>\n    <div class=\"grid-bg\"></div>\n    \n    <div class=\"container\">\n        <nav>\n            <div class=\"logo\">Run<span>Hive</span></div>\n            <div class=\"nav-tag\">AI Operations Agent</div>\n        </nav>\n\n        <section class=\"hero\">\n            <div class=\"hero-label\">For founders who'd rather build than manage</div>\n            <h1>Stop teaching AI.<br>Let it <em>run things</em>.</h1>\n            <p class=\"hero-sub\">RunHive is an autonomous AI agent that executes your business operations daily. SOPs, e-commerce workflows, reporting. Not a chatbot. An employee.</p>\n        </section>\n\n        <div class=\"divider\"></div>\n\n        <section class=\"contrast-section\">\n            <div class=\"contrast-grid\">\n                <div class=\"contrast-block old\">\n                    <h3>The old way</h3>\n                    <p>\n                        <span class=\"strike\">Learn prompt engineering.</span><br>\n                        <span class=\"strike\">Build automations yourself.</span><br>\n                        <span class=\"strike\">Hire VAs to follow SOPs.</span><br>\n                        <span class=\"strike\">Monitor everything manually.</span><br><br>\n                        Courses teach you how. You still do the work.\n                    </p>\n                </div>\n                <div class=\"contrast-block new\">\n                    <h3>The RunHive way</h3>\n                    <p>\n                        AI reads your SOPs and executes them.<br>\n                        Product listings optimized across Shopee, Lazada.<br>\n                        Competitor prices tracked and reported daily.<br>\n                        Customer inquiries handled before you wake up.<br><br>\n                        You set the strategy. RunHive runs it.\n                    </p>\n                </div>\n            </div>\n        </section>\n\n        <div class=\"divider\"></div>\n\n        <section class=\"capabilities\">\n            <h2>What RunHive does every day</h2>\n            <div class=\"cap-grid\">\n                <div class=\"cap-card\">\n                    <div class=\"cap-num\">01</div>\n                    <h4>Executes SOPs</h4>\n                    <p>Turn your documented processes into living agents. RunHive reads your SOPs and performs them autonomously, reporting back with outcomes, not questions.</p>\n                </div>\n                <div class=\"cap-card\">\n                    <div class=\"cap-num\">02</div>\n                    <h4>Runs E-Commerce Ops</h4>\n                    <p>Product listing optimization, keyword analysis, competitor monitoring across Southeast Asian marketplaces. The work a 5-person ops team does, running 24/7.</p>\n                </div>\n                <div class=\"cap-card\">\n                    <div class=\"cap-num\">03</div>\n                    <h4>Reports Outcomes</h4>\n                    <p>Every morning you get a brief: what was done, what changed, what needs your decision. Not dashboards to interpret. Clear actions taken, results delivered.</p>\n                </div>\n            </div>\n        </section>\n\n        <section class=\"signal\">\n            <div class=\"signal-box\">\n                <h2>The best business system is one that runs itself.</h2>\n                <p>RunHive was born from a simple observation: founders spend more time learning about AI than benefiting from it. We're building the AI operations layer that turns knowledge into execution, automatically.</p>\n            </div>\n        </section>\n\n        <footer>\n            <p>&copy; 2026 RunHive</p>\n            <div class=\"built-by\">Built autonomously by <a href=\"https://polsia.com\" target=\"_blank\">Polsia</a></div>\n        </footer>\n    </div>\n</body>\n</html>",
+              "suspension_reason": null,
+              "infra_suspended_at": null,
+              "og_image_url": null,
+              "ads_enabled": false,
+              "ads_daily_budget": "0.00",
+              "ads_campaign_id": null,
+              "ads_adset_id": null,
+              "ads_meta_sync_failed": false,
+              "ads_meta_sync_error": null,
+              "ads_meta_sync_failed_at": null,
+              "role": "owner",
+              "is_primary": true,
+              "app_url": "https://runhive.polsia.app"
+            }
+          ],
+          "primaryCompanyId": 13563
+        }
+      }
+    },
+    {
+      "name": "error_404",
+      "endpoint": "/api/nonexistent",
+      "method": "GET",
+      "response": {
+        "statusCode": 404,
+        "statusMessage": "Not Found",
+        "headers": {
+          "date": "Fri, 06 Mar 2026 05:51:04 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "cf-ray": "9d7f162369f704de-HKG",
+          "access-control-allow-credentials": "true",
+          "access-control-allow-origin": "https://www.polsia.com",
+          "etag": "W/\"27-vIQAhlrdw1eKTBltrdDTzhO3HK8\"",
+          "rndr-id": "aea0b0f2-7344-4e54",
+          "vary": "Origin, Accept-Encoding",
+          "x-powered-by": "Express",
+          "x-render-origin-server": "Render",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        },
+        "body": {
+          "success": false,
+          "message": "Not found"
+        }
+      }
+    },
+    {
+      "name": "rate_limiting",
+      "requests": [
+        {
+          "requestNum": 1,
+          "statusCode": 404,
+          "duration": 199
+        },
+        {
+          "requestNum": 2,
+          "statusCode": 404,
+          "duration": 198
+        },
+        {
+          "requestNum": 3,
+          "statusCode": 404,
+          "duration": 232
+        },
+        {
+          "requestNum": 4,
+          "statusCode": 404,
+          "duration": 225
+        },
+        {
+          "requestNum": 5,
+          "statusCode": 404,
+          "duration": 230
+        },
+        {
+          "requestNum": 6,
+          "statusCode": 404,
+          "duration": 195
+        },
+        {
+          "requestNum": 7,
+          "statusCode": 404,
+          "duration": 200
+        },
+        {
+          "requestNum": 8,
+          "statusCode": 404,
+          "duration": 240
+        },
+        {
+          "requestNum": 9,
+          "statusCode": 404,
+          "duration": 222
+        },
+        {
+          "requestNum": 10,
+          "statusCode": 404,
+          "duration": 224
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>CommandMate Pivot: Migration Guide</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">CommandMate Pivot: Migration Guide</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#commandmate-pivot-mac-mini-macbook-pro-migration-guide"
+id="toc-commandmate-pivot-mac-mini-macbook-pro-migration-guide">CommandMate
+Pivot: Mac mini → MacBook Pro Migration Guide</a>
+<ul>
+<li><a href="#option-a-polsia-for-vietnamese-smes"
+id="toc-option-a-polsia-for-vietnamese-smes">Option A: “Polsia for
+Vietnamese SMEs”</a></li>
+<li><a href="#tổng-quan" id="toc-tổng-quan">📋 Tổng Quan</a></li>
+<li><a href="#phase-1-macbook-pro-setup-30-45-phút"
+id="toc-phase-1-macbook-pro-setup-30-45-phút">🚀 Phase 1: MacBook Pro
+Setup (30-45 phút)</a>
+<ul>
+<li><a href="#step-1-install-core-tools"
+id="toc-step-1-install-core-tools">Step 1: Install Core Tools</a></li>
+<li><a href="#step-2-setup-ssh-key-for-github"
+id="toc-step-2-setup-ssh-key-for-github">Step 2: Setup SSH Key for
+GitHub</a></li>
+<li><a href="#step-3-clone-repository"
+id="toc-step-3-clone-repository">Step 3: Clone Repository</a></li>
+<li><a href="#step-4-install-dependencies"
+id="toc-step-4-install-dependencies">Step 4: Install
+Dependencies</a></li>
+<li><a href="#step-5-setup-environment-variables"
+id="toc-step-5-setup-environment-variables">Step 5: Setup Environment
+Variables</a></li>
+<li><a href="#step-6-test-local-development"
+id="toc-step-6-test-local-development">Step 6: Test Local
+Development</a></li>
+<li><a href="#step-7-install-vscode-claude-code-max"
+id="toc-step-7-install-vscode-claude-code-max">Step 7: Install VSCode +
+Claude Code Max</a></li>
+</ul></li>
+<li><a href="#phase-2-database-backup-strategy"
+id="toc-phase-2-database-backup-strategy">💾 Phase 2: Database Backup
+Strategy</a>
+<ul>
+<li><a href="#current-database-supabase-production"
+id="toc-current-database-supabase-production">Current Database: Supabase
+Production</a></li>
+<li><a href="#backup-strategy" id="toc-backup-strategy">Backup
+Strategy</a></li>
+<li><a href="#development-database-strategy"
+id="toc-development-database-strategy">Development Database
+Strategy</a></li>
+</ul></li>
+<li><a href="#phase-3-new-architecture-pivot-to-business-first"
+id="toc-phase-3-new-architecture-pivot-to-business-first">🏗️ Phase 3:
+New Architecture (Pivot to Business-First)</a>
+<ul>
+<li><a href="#current-architecture-mcp-focused"
+id="toc-current-architecture-mcp-focused">Current Architecture
+(MCP-focused)</a></li>
+<li><a href="#new-architecture-business-os-pivot"
+id="toc-new-architecture-business-os-pivot">New Architecture (Business
+OS Pivot)</a></li>
+<li><a href="#database-schema-changes-extend-dont-replace"
+id="toc-database-schema-changes-extend-dont-replace">Database Schema
+Changes (Extend, Don’t Replace)</a></li>
+<li><a href="#ui-component-structure" id="toc-ui-component-structure">UI
+Component Structure</a></li>
+<li><a href="#feature-flags-gradual-rollout"
+id="toc-feature-flags-gradual-rollout">Feature Flags (Gradual
+Rollout)</a></li>
+</ul></li>
+<li><a href="#phase-4-development-workflow"
+id="toc-phase-4-development-workflow">🔄 Phase 4: Development
+Workflow</a>
+<ul>
+<li><a href="#branch-strategy" id="toc-branch-strategy">Branch
+Strategy</a></li>
+<li><a href="#development-loop" id="toc-development-loop">Development
+Loop</a></li>
+<li><a href="#code-review-with-claude"
+id="toc-code-review-with-claude">Code Review with Claude</a></li>
+</ul></li>
+<li><a href="#phase-5-backup-safety" id="toc-phase-5-backup-safety">📦
+Phase 5: Backup &amp; Safety</a>
+<ul>
+<li><a href="#git-backup-strategy" id="toc-git-backup-strategy">Git
+Backup Strategy</a></li>
+<li><a href="#rollback-plan" id="toc-rollback-plan">Rollback
+Plan</a></li>
+</ul></li>
+<li><a href="#timeline" id="toc-timeline">⏱️ Timeline</a>
+<ul>
+<li><a href="#week-1-setup-wireframe-march-12-19"
+id="toc-week-1-setup-wireframe-march-12-19">Week 1: Setup + Wireframe
+(March 12-19)</a></li>
+<li><a href="#week-2-backend-integration-march-19-26"
+id="toc-week-2-backend-integration-march-19-26">Week 2: Backend +
+Integration (March 19-26)</a></li>
+<li><a href="#week-3-playbooks-polish-march-26---april-2"
+id="toc-week-3-playbooks-polish-march-26---april-2">Week 3: Playbooks +
+Polish (March 26 - April 2)</a></li>
+<li><a href="#week-4-beta-launch-april-2-9"
+id="toc-week-4-beta-launch-april-2-9">Week 4: Beta Launch (April
+2-9)</a></li>
+</ul></li>
+<li><a href="#support-troubleshooting"
+id="toc-support-troubleshooting">📞 Support &amp; Troubleshooting</a>
+<ul>
+<li><a href="#common-issues" id="toc-common-issues">Common
+Issues</a></li>
+</ul></li>
+<li><a href="#success-criteria" id="toc-success-criteria">🎯 Success
+Criteria</a></li>
+<li><a href="#next-steps-after-setup" id="toc-next-steps-after-setup">📚
+Next Steps After Setup</a></li>
+<li><a href="#need-help" id="toc-need-help">🆘 Need Help?</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1
+id="commandmate-pivot-mac-mini-macbook-pro-migration-guide">CommandMate
+Pivot: Mac mini → MacBook Pro Migration Guide</h1>
+<h2 id="option-a-polsia-for-vietnamese-smes">Option A: “Polsia for
+Vietnamese SMEs”</h2>
+<p><strong>Created:</strong> 2026-03-12 15:00 ICT<br />
+<strong>Owner:</strong> Đệ 🐾 + Sếp Victor<br />
+<strong>Goal:</strong> Setup MacBook Pro for CommandMate pivot
+development (VSCode + Claude Code Max)</p>
+<hr />
+<h2 id="tổng-quan">📋 Tổng Quan</h2>
+<p><strong>Current State:</strong> - <strong>Mac mini:</strong>
+Production repo at
+<code>/Users/bizmatehub/Projects/mission-control</code> -
+<strong>GitHub:</strong>
+<code>git@github.com:Victorpham1984/mission-control.git</code> -
+<strong>Deploy:</strong> Vercel
+(https://mission-control-sable-three.vercel.app) -
+<strong>Database:</strong> Supabase (production data) -
+<strong>Codebase:</strong> ~14,173 lines (Next.js 15 + Supabase +
+MCP)</p>
+<p><strong>Target State:</strong> - <strong>MacBook Pro:</strong>
+Development environment (VSCode + Claude Code Max) -
+<strong>Workflow:</strong> Code on MacBook → Push to GitHub →
+Auto-deploy Vercel - <strong>Database:</strong> Use Supabase production
+(read-only mode during dev) - <strong>Architecture:</strong> Pivot to
+business-first UI (CEO dashboard, onboarding, playbooks)</p>
+<hr />
+<h2 id="phase-1-macbook-pro-setup-30-45-phút">🚀 Phase 1: MacBook Pro
+Setup (30-45 phút)</h2>
+<h3 id="step-1-install-core-tools">Step 1: Install Core Tools</h3>
+<p><strong>Terminal commands:</strong></p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Install Homebrew (nếu chưa có)</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">/bin/bash</span> <span class="at">-c</span> <span class="st">&quot;</span><span class="va">$(</span><span class="ex">curl</span> <span class="at">-fsSL</span> https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh<span class="va">)</span><span class="st">&quot;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Install Node.js (v22+)</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> install node@22</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&#39;export PATH=&quot;/opt/homebrew/opt/node@22/bin:$PATH&quot;&#39;</span> <span class="op">&gt;&gt;</span> ~/.zshrc</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> ~/.zshrc</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Verify versions</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">node</span> <span class="at">--version</span>  <span class="co"># Should be v22.x</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> <span class="at">--version</span>   <span class="co"># Should be 10.x+</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Install Git (nếu chưa có)</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> install git</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Configure Git</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> config <span class="at">--global</span> user.name <span class="st">&quot;Victor Pham&quot;</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> config <span class="at">--global</span> user.email <span class="st">&quot;victor@bizmatehub.com&quot;</span>  <span class="co"># Use your actual email</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. Install pnpm (package manager)</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> install <span class="at">-g</span> pnpm</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co"># 7. Verify</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="ex">pnpm</span> <span class="at">--version</span>  <span class="co"># Should be 9.x+</span></span></code></pre></div>
+<hr />
+<h3 id="step-2-setup-ssh-key-for-github">Step 2: Setup SSH Key for
+GitHub</h3>
+<p><strong>Generate SSH key:</strong></p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Generate new SSH key</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh-keygen</span> <span class="at">-t</span> ed25519 <span class="at">-C</span> <span class="st">&quot;victor@bizmatehub.com&quot;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Press Enter 3 times (default location, no passphrase)</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Start SSH agent</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="bu">eval</span> <span class="st">&quot;</span><span class="va">$(</span><span class="fu">ssh-agent</span> <span class="at">-s</span><span class="va">)</span><span class="st">&quot;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Add key to agent</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh-add</span> ~/.ssh/id_ed25519</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Copy public key to clipboard</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> ~/.ssh/id_ed25519.pub <span class="kw">|</span> <span class="ex">pbcopy</span></span></code></pre></div>
+<p><strong>Add to GitHub:</strong> 1. Open
+https://github.com/settings/keys 2. Click “New SSH key” 3. Title:
+<code>MacBook Pro - CommandMate Dev</code> 4. Paste key from clipboard
+5. Click “Add SSH key”</p>
+<p><strong>Test connection:</strong></p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ssh</span> <span class="at">-T</span> git@github.com</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Should see: &quot;Hi Victorpham1984! You&#39;ve successfully authenticated...&quot;</span></span></code></pre></div>
+<hr />
+<h3 id="step-3-clone-repository">Step 3: Clone Repository</h3>
+<p><strong>Choose location:</strong></p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Option A: ~/Projects (same as Mac mini)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> ~/Projects</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/Projects</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Option B: ~/Code (if you prefer)</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> ~/Code</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/Code</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Clone repo</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:Victorpham1984/mission-control.git commandmate-pivot</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Enter directory</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> commandmate-pivot</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Check branches</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> branch <span class="at">-a</span></span></code></pre></div>
+<p><strong>Expected output:</strong></p>
+<pre><code>* main
+  remotes/origin/dev
+  remotes/origin/main
+  remotes/origin/feature/phase-2b-frontend</code></pre>
+<hr />
+<h3 id="step-4-install-dependencies">Step 4: Install Dependencies</h3>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install all packages</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pnpm</span> install</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Wait 2-3 minutes for download + install</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Should see ~500+ packages installed</span></span></code></pre></div>
+<hr />
+<h3 id="step-5-setup-environment-variables">Step 5: Setup Environment
+Variables</h3>
+<p><strong>Copy secrets from Mac mini:</strong></p>
+<p><strong>On Mac mini (current session), run:</strong></p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/Projects/mission-control</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> .env.local</span></code></pre></div>
+<p><strong>Copy output to MacBook Pro:</strong></p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># On MacBook Pro</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/Projects/commandmate-pivot  <span class="co"># Or wherever you cloned</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create .env.local</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">nano</span> .env.local</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Paste these values (get from Mac mini):</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="va">NEXT_PUBLIC_SUPABASE_URL</span><span class="op">=</span>https://your-project.supabase.co</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="va">NEXT_PUBLIC_SUPABASE_ANON_KEY</span><span class="op">=</span>eyJ...</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="va">SUPABASE_SERVICE_ROLE_KEY</span><span class="op">=</span>eyJ...</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="va">OPENCLAW_GATEWAY_URL</span><span class="op">=</span>http://localhost:3000</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="va">OPENCLAW_GATEWAY_TOKEN</span><span class="op">=</span>your-token-here</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="va">YOUTUBE_API_KEY</span><span class="op">=</span>AIza...</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="va">OPENROUTER_API_KEY</span><span class="op">=</span>sk-or-...</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="va">ADMIN_PASSWORD</span><span class="op">=</span>your-admin-password</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="va">CRON_SECRET</span><span class="op">=</span>your-cron-secret</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Save: Ctrl+O, Enter, Ctrl+X</span></span></code></pre></div>
+<p><strong>Security check:</strong></p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify .env.local is gitignored</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> .gitignore <span class="kw">|</span> <span class="fu">grep</span> <span class="st">&quot;.env.local&quot;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Should see: .env.local</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify file exists but NOT tracked</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Should NOT see .env.local in &quot;Changes to be committed&quot;</span></span></code></pre></div>
+<hr />
+<h3 id="step-6-test-local-development">Step 6: Test Local
+Development</h3>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Start dev server</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pnpm</span> dev</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Should start on http://localhost:3000</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Open browser and verify site loads</span></span></code></pre></div>
+<p><strong>Verify:</strong> - ✅ Home page loads (no errors) - ✅
+Supabase connection works (check browser console) - ✅ No build errors
+in terminal</p>
+<p><strong>Stop server:</strong></p>
+<pre><code>Ctrl+C</code></pre>
+<hr />
+<h3 id="step-7-install-vscode-claude-code-max">Step 7: Install VSCode +
+Claude Code Max</h3>
+<p><strong>Install VSCode:</strong> 1. Download from
+https://code.visualstudio.com/ 2. Drag to Applications folder 3. Open
+VSCode</p>
+<p><strong>Install extensions:</strong></p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Open command palette: Cmd+Shift+P</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Type: &quot;Shell Command: Install &#39;code&#39; command in PATH&quot;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Click to install</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Install extensions via terminal</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="ex">code</span> <span class="at">--install-extension</span> GitHub.copilot</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="ex">code</span> <span class="at">--install-extension</span> dbaeumer.vscode-eslint</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="ex">code</span> <span class="at">--install-extension</span> esbenp.prettier-vscode</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="ex">code</span> <span class="at">--install-extension</span> bradlc.vscode-tailwindcss</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="ex">code</span> <span class="at">--install-extension</span> Prisma.prisma</span></code></pre></div>
+<p><strong>Install Claude Code Max (Anthropic):</strong> 1. Open VSCode
+Extensions panel (Cmd+Shift+X) 2. Search: “Claude Code” 3. Install
+“Claude Code Max” by Anthropic 4. Sign in with Anthropic account 5.
+Configure API key (if needed)</p>
+<p><strong>Open project:</strong></p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/Projects/commandmate-pivot</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">code</span> .</span></code></pre></div>
+<hr />
+<h2 id="phase-2-database-backup-strategy">💾 Phase 2: Database Backup
+Strategy</h2>
+<h3 id="current-database-supabase-production">Current Database: Supabase
+Production</h3>
+<p><strong>Tables (from schema):</strong> - <code>users</code> - User
+accounts - <code>workspaces</code> - User workspaces -
+<code>workspace_members</code> - Membership data - <code>agents</code> -
+MCP agents - <code>mcp_servers</code> - MCP server configs -
+<code>mcp_tools</code> - Available tools - <code>tasks</code> - Agent
+tasks - <code>webhooks</code> - Webhook configs</p>
+<h3 id="backup-strategy">Backup Strategy</h3>
+<p><strong>Option A: Use Supabase Dashboard (Recommended)</strong></p>
+<ol type="1">
+<li>Go to https://supabase.com/dashboard</li>
+<li>Select project: <code>mission-control</code></li>
+<li>Go to: Database → Backups</li>
+<li>Click “Create Backup” → Wait 2-3 minutes</li>
+<li>Download backup file (SQL format)</li>
+<li>Save to:
+<code>~/Backups/commandmate-backup-2026-03-12.sql</code></li>
+</ol>
+<p><strong>Option B: CLI Backup (Alternative)</strong></p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install Supabase CLI</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> install supabase/tap/supabase</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Login</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="ex">supabase</span> login</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Link project</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="ex">supabase</span> link <span class="at">--project-ref</span> your-project-ref</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Create backup</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="ex">supabase</span> db dump <span class="at">-f</span> ~/Backups/commandmate-backup-2026-03-12.sql</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify file</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-lh</span> ~/Backups/commandmate-backup-2026-03-12.sql</span></code></pre></div>
+<h3 id="development-database-strategy">Development Database
+Strategy</h3>
+<p><strong>Recommended: Keep using production Supabase during
+pivot</strong></p>
+<p><strong>Why:</strong> - Avoid data sync issues - Faster development
+(no local Postgres setup) - Easy rollback if pivot fails</p>
+<p><strong>Safety measures:</strong> 1. <strong>Read-only mode during
+development:</strong> ```typescript // Add to lib/supabaseClient.ts
+const DEV_MODE = process.env.NODE_ENV === ‘development’;</p>
+<p>// Wrap mutations in dev check if (DEV_MODE &amp;&amp;
+!confirmMutation) { console.warn(‘⚠️ Mutation blocked in dev mode’);
+return; } ```</p>
+<ol start="2" type="1">
+<li><p><strong>Use feature flags for new UI:</strong></p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">// app/dashboard/page.tsx</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> BUSINESS_UI <span class="op">=</span> <span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">NEXT_PUBLIC_BUSINESS_UI</span> <span class="op">===</span> <span class="st">&#39;true&#39;</span><span class="op">;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> BUSINESS_UI <span class="op">?</span> <span class="op">&lt;</span>CEODashboard <span class="op">/&gt;</span> <span class="op">:</span> <span class="op">&lt;</span>TechDashboard <span class="op">/&gt;;</span></span></code></pre></div></li>
+<li><p><strong>Branch strategy:</strong></p>
+<ul>
+<li><code>main</code> = production (current MCP-focused UI)</li>
+<li><code>pivot/business-os</code> = new branch for pivot work</li>
+<li>Keep both alive until pivot proven</li>
+</ul></li>
+</ol>
+<hr />
+<h2 id="phase-3-new-architecture-pivot-to-business-first">🏗️ Phase 3:
+New Architecture (Pivot to Business-First)</h2>
+<h3 id="current-architecture-mcp-focused">Current Architecture
+(MCP-focused)</h3>
+<pre><code>┌─────────────────────────────────────────┐
+│         Next.js 15 Frontend             │
+│  (Agent-centric UI: servers, tools)     │
+├─────────────────────────────────────────┤
+│         API Routes                      │
+│  /api/v1/mcp/*  (MCP operations)        │
+│  /api/auth/*    (Supabase auth)         │
+├─────────────────────────────────────────┤
+│         Supabase                        │
+│  (users, workspaces, mcp_servers, etc.) │
+└─────────────────────────────────────────┘</code></pre>
+<p><strong>Pages:</strong> - <code>/dashboard</code> - Agent management
+(tech-focused) - <code>/agents</code> - MCP agent list -
+<code>/tools</code> - MCP tool catalog - <code>/settings</code> - Config
+(agent-centric)</p>
+<hr />
+<h3 id="new-architecture-business-os-pivot">New Architecture (Business
+OS Pivot)</h3>
+<pre><code>┌────────────────────────────────────────────┐
+│         Next.js 15 Frontend                │
+│  (Business-first UI: goals, KPIs, etc.)   │
+├────────────────────────────────────────────┤
+│  🆕 CEO Dashboard                          │
+│  - Company health overview                 │
+│  - Revenue, KPIs, Bottlenecks              │
+│  - Next 24h action plan                    │
+├────────────────────────────────────────────┤
+│  🆕 Onboarding Wizard                      │
+│  - 5-min magic setup                       │
+│  - Auto-generate: landing, email, tasks    │
+│  - Instant value delivery                  │
+├────────────────────────────────────────────┤
+│  🆕 Playbook Library                       │
+│  - E-commerce SaaS (COSMATE template)      │
+│  - Content Creator                         │
+│  - B2B Lead Gen                            │
+├────────────────────────────────────────────┤
+│         API Routes                         │
+│  /api/business/* (new business endpoints)  │
+│  /api/v1/mcp/*   (keep for backend)        │
+├────────────────────────────────────────────┤
+│         Supabase (Extended Schema)         │
+│  🆕 companies, goals, kpis, playbooks     │
+│  (keep existing: users, workspaces, etc.)  │
+└────────────────────────────────────────────┘</code></pre>
+<p><strong>New Pages:</strong> - <code>/</code> - Landing page
+(Vietnamese, SEA-focused) - <code>/onboarding</code> - 5-min wizard
+(company → ICP → playbook → launch) - <code>/ceo</code> - CEO Dashboard
+(health, KPIs, actions) - <code>/playbooks</code> - Template library
+(install &amp; customize) - <code>/apps</code> - Installed playbooks
+(e.g., “E-commerce OS”) - <code>/settings/billing</code> - Pricing &amp;
+usage (action-based)</p>
+<hr />
+<h3 id="database-schema-changes-extend-dont-replace">Database Schema
+Changes (Extend, Don’t Replace)</h3>
+<p><strong>New tables to add:</strong></p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Companies (business entity)</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> companies (</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">id</span> UUID <span class="kw">PRIMARY</span> <span class="kw">KEY</span> <span class="kw">DEFAULT</span> uuid_generate_v4(),</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  workspace_id UUID <span class="kw">REFERENCES</span> workspaces(<span class="kw">id</span>),</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  name TEXT <span class="kw">NOT</span> <span class="kw">NULL</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  mission TEXT,</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  icp_segment TEXT,  <span class="co">-- &#39;creator&#39; | &#39;sme&#39; | &#39;agency&#39;</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  industry TEXT,</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  created_at TIMESTAMPTZ <span class="kw">DEFAULT</span> NOW()</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>);</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="co">-- Goals (business objectives)</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> goals (</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>  <span class="kw">id</span> UUID <span class="kw">PRIMARY</span> <span class="kw">KEY</span> <span class="kw">DEFAULT</span> uuid_generate_v4(),</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>  company_id UUID <span class="kw">REFERENCES</span> companies(<span class="kw">id</span>),</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>  title TEXT <span class="kw">NOT</span> <span class="kw">NULL</span>,</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>  target_value <span class="dt">DECIMAL</span>,</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>  current_value <span class="dt">DECIMAL</span>,</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>  unit TEXT,  <span class="co">-- &#39;MRR&#39; | &#39;users&#39; | &#39;leads&#39;</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>  deadline <span class="dt">DATE</span>,</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>  status TEXT <span class="kw">DEFAULT</span> <span class="st">&#39;active&#39;</span>,  <span class="co">-- &#39;active&#39; | &#39;completed&#39; | &#39;paused&#39;</span></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>  created_at TIMESTAMPTZ <span class="kw">DEFAULT</span> NOW()</span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>);</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a><span class="co">-- KPIs (key performance indicators)</span></span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> kpis (</span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>  <span class="kw">id</span> UUID <span class="kw">PRIMARY</span> <span class="kw">KEY</span> <span class="kw">DEFAULT</span> uuid_generate_v4(),</span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>  company_id UUID <span class="kw">REFERENCES</span> companies(<span class="kw">id</span>),</span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>  name TEXT <span class="kw">NOT</span> <span class="kw">NULL</span>,</span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>  <span class="kw">category</span> TEXT,  <span class="co">-- &#39;acquisition&#39; | &#39;activation&#39; | &#39;revenue&#39; | &#39;operations&#39;</span></span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>  current_value <span class="dt">DECIMAL</span>,</span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>  target_value <span class="dt">DECIMAL</span>,</span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>  unit TEXT,</span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>  updated_at TIMESTAMPTZ <span class="kw">DEFAULT</span> NOW()</span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>);</span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a><span class="co">-- Playbooks (pre-built templates)</span></span>
+<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> playbooks (</span>
+<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>  <span class="kw">id</span> UUID <span class="kw">PRIMARY</span> <span class="kw">KEY</span> <span class="kw">DEFAULT</span> uuid_generate_v4(),</span>
+<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>  name TEXT <span class="kw">NOT</span> <span class="kw">NULL</span>,</span>
+<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a>  description TEXT,</span>
+<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a>  <span class="kw">category</span> TEXT,  <span class="co">-- &#39;ecommerce&#39; | &#39;content&#39; | &#39;b2b&#39;</span></span>
+<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a>  config JSONB,  <span class="co">-- Skills, cron jobs, KPI structure</span></span>
+<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a>  created_at TIMESTAMPTZ <span class="kw">DEFAULT</span> NOW()</span>
+<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a>);</span>
+<span id="cb18-46"><a href="#cb18-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-47"><a href="#cb18-47" aria-hidden="true" tabindex="-1"></a><span class="co">-- Installed Playbooks (company-specific)</span></span>
+<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> installed_playbooks (</span>
+<span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a>  <span class="kw">id</span> UUID <span class="kw">PRIMARY</span> <span class="kw">KEY</span> <span class="kw">DEFAULT</span> uuid_generate_v4(),</span>
+<span id="cb18-50"><a href="#cb18-50" aria-hidden="true" tabindex="-1"></a>  company_id UUID <span class="kw">REFERENCES</span> companies(<span class="kw">id</span>),</span>
+<span id="cb18-51"><a href="#cb18-51" aria-hidden="true" tabindex="-1"></a>  playbook_id UUID <span class="kw">REFERENCES</span> playbooks(<span class="kw">id</span>),</span>
+<span id="cb18-52"><a href="#cb18-52" aria-hidden="true" tabindex="-1"></a>  customization JSONB,</span>
+<span id="cb18-53"><a href="#cb18-53" aria-hidden="true" tabindex="-1"></a>  active <span class="dt">BOOLEAN</span> <span class="kw">DEFAULT</span> <span class="kw">true</span>,</span>
+<span id="cb18-54"><a href="#cb18-54" aria-hidden="true" tabindex="-1"></a>  installed_at TIMESTAMPTZ <span class="kw">DEFAULT</span> NOW()</span>
+<span id="cb18-55"><a href="#cb18-55" aria-hidden="true" tabindex="-1"></a>);</span>
+<span id="cb18-56"><a href="#cb18-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-57"><a href="#cb18-57" aria-hidden="true" tabindex="-1"></a><span class="co">-- Actions (business operations log)</span></span>
+<span id="cb18-58"><a href="#cb18-58" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> actions (</span>
+<span id="cb18-59"><a href="#cb18-59" aria-hidden="true" tabindex="-1"></a>  <span class="kw">id</span> UUID <span class="kw">PRIMARY</span> <span class="kw">KEY</span> <span class="kw">DEFAULT</span> uuid_generate_v4(),</span>
+<span id="cb18-60"><a href="#cb18-60" aria-hidden="true" tabindex="-1"></a>  company_id UUID <span class="kw">REFERENCES</span> companies(<span class="kw">id</span>),</span>
+<span id="cb18-61"><a href="#cb18-61" aria-hidden="true" tabindex="-1"></a>  action_type TEXT,  <span class="co">-- &#39;send_email&#39; | &#39;post_social&#39; | &#39;update_crm&#39;</span></span>
+<span id="cb18-62"><a href="#cb18-62" aria-hidden="true" tabindex="-1"></a>  description TEXT,</span>
+<span id="cb18-63"><a href="#cb18-63" aria-hidden="true" tabindex="-1"></a>  success <span class="dt">BOOLEAN</span>,</span>
+<span id="cb18-64"><a href="#cb18-64" aria-hidden="true" tabindex="-1"></a>  evidence JSONB,  <span class="co">-- Screenshots, links, metrics</span></span>
+<span id="cb18-65"><a href="#cb18-65" aria-hidden="true" tabindex="-1"></a>  <span class="kw">cost</span> <span class="dt">DECIMAL</span>,</span>
+<span id="cb18-66"><a href="#cb18-66" aria-hidden="true" tabindex="-1"></a>  created_at TIMESTAMPTZ <span class="kw">DEFAULT</span> NOW()</span>
+<span id="cb18-67"><a href="#cb18-67" aria-hidden="true" tabindex="-1"></a>);</span></code></pre></div>
+<p><strong>Keep existing tables:</strong> - <code>users</code> - Still
+needed for auth - <code>workspaces</code> - Map to companies -
+<code>mcp_servers</code> - Use as backend execution engine -
+<code>mcp_tools</code> - Skills library for playbooks</p>
+<hr />
+<h3 id="ui-component-structure">UI Component Structure</h3>
+<p><strong>New directories:</strong></p>
+<pre><code>src/
+├── app/
+│   ├── (business)/          # Business-first UI (new)
+│   │   ├── layout.tsx       # Vietnamese UI, business nav
+│   │   ├── page.tsx         # Landing page
+│   │   ├── onboarding/
+│   │   │   ├── page.tsx     # 5-min wizard
+│   │   │   └── steps/       # Step components
+│   │   ├── ceo/
+│   │   │   ├── page.tsx     # CEO dashboard
+│   │   │   ├── health.tsx   # Company health widget
+│   │   │   ├── kpis.tsx     # KPI board
+│   │   │   └── actions.tsx  # Next 24h plan
+│   │   ├── playbooks/
+│   │   │   ├── page.tsx     # Template library
+│   │   │   ├── [id].tsx     # Playbook detail
+│   │   │   └── install.tsx  # Install flow
+│   │   └── apps/
+│   │       ├── page.tsx     # Installed playbooks
+│   │       └── [id]/        # App dashboard
+│   │
+│   ├── (tech)/              # Tech UI (keep for backend)
+│   │   ├── dashboard/       # Old MCP dashboard
+│   │   ├── agents/
+│   │   └── tools/
+│   │
+│   └── api/
+│       ├── business/        # New business endpoints
+│       │   ├── companies/
+│       │   ├── goals/
+│       │   ├── kpis/
+│       │   ├── playbooks/
+│       │   └── actions/
+│       └── v1/mcp/          # Keep existing MCP API
+│
+├── components/
+│   ├── business/            # Business UI components
+│   │   ├── CompanyHealth.tsx
+│   │   ├── KPICard.tsx
+│   │   ├── ActionLog.tsx
+│   │   └── PlaybookCard.tsx
+│   └── tech/                # Tech UI (keep)
+│
+└── lib/
+    ├── playbooks/           # Playbook templates
+    │   ├── ecommerce-saas.ts
+    │   ├── content-creator.ts
+    │   └── b2b-leadgen.ts
+    └── actions/             # Action handlers
+        ├── email.ts
+        ├── social.ts
+        └── crm.ts</code></pre>
+<hr />
+<h3 id="feature-flags-gradual-rollout">Feature Flags (Gradual
+Rollout)</h3>
+<p><strong>Environment variables:</strong></p>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># .env.local</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="va">NEXT_PUBLIC_BUSINESS_UI</span><span class="op">=</span>true          <span class="co"># Enable business UI</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="va">NEXT_PUBLIC_TECH_UI</span><span class="op">=</span>true              <span class="co"># Keep tech UI (for debugging)</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="va">NEXT_PUBLIC_ONBOARDING_WIZARD</span><span class="op">=</span>true    <span class="co"># Enable 5-min wizard</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="va">NEXT_PUBLIC_CEO_DASHBOARD</span><span class="op">=</span>true        <span class="co"># Enable CEO dashboard</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="va">NEXT_PUBLIC_PLAYBOOKS</span><span class="op">=</span>true            <span class="co"># Enable playbook library</span></span></code></pre></div>
+<p><strong>Code example:</strong></p>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">// app/layout.tsx</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> BUSINESS_UI <span class="op">=</span> <span class="bu">process</span><span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">NEXT_PUBLIC_BUSINESS_UI</span> <span class="op">===</span> <span class="st">&#39;true&#39;</span><span class="op">;</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="im">default</span> <span class="kw">function</span> <span class="fu">RootLayout</span>({ children }) {</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> (</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>html lang<span class="op">=</span>{BUSINESS_UI <span class="op">?</span> <span class="st">&#39;vi&#39;</span> <span class="op">:</span> <span class="st">&#39;en&#39;</span>}<span class="op">&gt;</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>      <span class="op">&lt;</span>body<span class="op">&gt;</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>        {BUSINESS_UI <span class="op">?</span> <span class="op">&lt;</span>BusinessNav <span class="op">/&gt;</span> <span class="op">:</span> <span class="op">&lt;</span>TechNav <span class="op">/&gt;</span>}</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>        {children}</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>      <span class="op">&lt;/</span>body<span class="op">&gt;</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;/</span>html<span class="op">&gt;</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  )<span class="op">;</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<hr />
+<h2 id="phase-4-development-workflow">🔄 Phase 4: Development
+Workflow</h2>
+<h3 id="branch-strategy">Branch Strategy</h3>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Mac mini (current production)</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="ex">main</span>              <span class="co"># Keep stable, current MCP version</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">├──</span> dev         <span class="co"># Tech features (MCP integration)</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="co"># MacBook Pro (pivot work)</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="ex">pivot/business-os</span> <span class="co"># New branch for pivot</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="ex">├──</span> pivot/onboarding</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="ex">├──</span> pivot/ceo-dashboard</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="ex">└──</span> pivot/playbooks</span></code></pre></div>
+<p><strong>Create pivot branch:</strong></p>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># On MacBook Pro</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/Projects/commandmate-pivot</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create new branch from main</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout main</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> pull origin main</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout <span class="at">-b</span> pivot/business-os</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Push to GitHub</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push <span class="at">-u</span> origin pivot/business-os</span></code></pre></div>
+<hr />
+<h3 id="development-loop">Development Loop</h3>
+<p><strong>On MacBook Pro:</strong></p>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Start dev server</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pnpm</span> dev</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Edit files in VSCode</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Use Claude Code Max for AI-assisted coding</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Test changes locally</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Open http://localhost:3000</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Commit changes</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add .</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">&quot;feat: Add CEO dashboard wireframe&quot;</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Push to GitHub</span></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push origin pivot/business-os</span></code></pre></div>
+<p><strong>Deploy strategy:</strong></p>
+<p><strong>Option A: Separate Vercel project (Recommended)</strong> -
+Create new Vercel project: <code>commandmate-pivot</code> - Connect to
+branch: <code>pivot/business-os</code> - URL:
+<code>https://commandmate-pivot.vercel.app</code> - Keep production
+stable: <code>https://mission-control-sable-three.vercel.app</code></p>
+<p><strong>Option B: Same project, preview deployment</strong> - Push to
+<code>pivot/business-os</code> → Auto-preview URL - Only merge to
+<code>main</code> when pivot ready to replace production</p>
+<hr />
+<h3 id="code-review-with-claude">Code Review with Claude</h3>
+<p><strong>VSCode shortcuts with Claude Code Max:</strong></p>
+<pre><code>Cmd+K    Ask Claude (inline)
+Cmd+L    Explain code
+Cmd+I    Generate code from prompt
+Cmd+E    Edit selection with AI</code></pre>
+<p><strong>Example prompts:</strong></p>
+<ol type="1">
+<li>“Convert this MCP agent dashboard to a business-first CEO dashboard
+with Vietnamese UI”</li>
+<li>“Generate Supabase schema migration for adding companies, goals, and
+KPIs tables”</li>
+<li>“Build a 5-step onboarding wizard component with form validation and
+progress bar”</li>
+<li>“Create a playbook template for e-commerce SaaS with pre-configured
+skills and cron jobs”</li>
+</ol>
+<hr />
+<h2 id="phase-5-backup-safety">📦 Phase 5: Backup &amp; Safety</h2>
+<h3 id="git-backup-strategy">Git Backup Strategy</h3>
+<p><strong>Auto-backup script:</strong></p>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create backup script</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nano</span> ~/backup-commandmate.sh</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Paste this:</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="va">DATE</span><span class="op">=</span><span class="va">$(</span><span class="fu">date</span> +%Y-%m-%d-%H%M<span class="va">)</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="va">BACKUP_DIR</span><span class="op">=</span>~/Backups/commandmate</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> <span class="va">$BACKUP_DIR</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Backup code</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/Projects/commandmate-pivot</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> bundle create <span class="va">$BACKUP_DIR</span>/repo-<span class="va">$DATE</span>.bundle <span class="at">--all</span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Backup .env</span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> .env.local <span class="va">$BACKUP_DIR</span>/env-<span class="va">$DATE</span>.txt</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Backup database (if using local)</span></span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a><span class="co"># supabase db dump -f $BACKUP_DIR/db-$DATE.sql</span></span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;✅ Backup complete: </span><span class="va">$BACKUP_DIR</span><span class="st">/repo-</span><span class="va">$DATE</span><span class="st">.bundle&quot;</span></span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Save: Ctrl+O, Enter, Ctrl+X</span></span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Make executable</span></span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x ~/backup-commandmate.sh</span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Run manually</span></span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a><span class="ex">~/backup-commandmate.sh</span></span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Or schedule daily (optional)</span></span>
+<span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a><span class="fu">crontab</span> <span class="at">-e</span></span>
+<span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Add line: 0 2 * * * ~/backup-commandmate.sh</span></span></code></pre></div>
+<hr />
+<h3 id="rollback-plan">Rollback Plan</h3>
+<p><strong>If pivot fails:</strong></p>
+<div class="sourceCode" id="cb27"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Switch back to main branch</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout main</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Verify production still works</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pnpm</span> dev</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Delete pivot branch (if needed)</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> branch <span class="at">-D</span> pivot/business-os</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push origin <span class="at">--delete</span> pivot/business-os</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Restore database from backup (if modified)</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a><span class="ex">supabase</span> db reset</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a><span class="ex">psql</span> <span class="at">-f</span> ~/Backups/commandmate-backup-2026-03-12.sql</span></code></pre></div>
+<hr />
+<h2 id="timeline">⏱️ Timeline</h2>
+<h3 id="week-1-setup-wireframe-march-12-19">Week 1: Setup + Wireframe
+(March 12-19)</h3>
+<ul>
+<li>✅ Day 1: MacBook Pro setup (this guide)</li>
+<li>📋 Day 2-3: Database schema design + migration</li>
+<li>🎨 Day 4-5: CEO dashboard wireframe (no backend)</li>
+<li>📝 Day 6-7: Onboarding wizard UI mockup</li>
+</ul>
+<h3 id="week-2-backend-integration-march-19-26">Week 2: Backend +
+Integration (March 19-26)</h3>
+<ul>
+<li>🔧 Day 1-2: API endpoints (companies, goals, KPIs)</li>
+<li>🔌 Day 3-4: Connect CEO dashboard to Supabase</li>
+<li>✨ Day 5-6: Onboarding wizard backend (artifact generation)</li>
+<li>🧪 Day 7: Testing + bug fixes</li>
+</ul>
+<h3 id="week-3-playbooks-polish-march-26---april-2">Week 3: Playbooks +
+Polish (March 26 - April 2)</h3>
+<ul>
+<li>📚 Day 1-3: Build first playbook (E-commerce SaaS from COSMATE)</li>
+<li>🎀 Day 4-5: UI polish + Vietnamese localization</li>
+<li>📊 Day 6: Action-based tracking (log business operations)</li>
+<li>🚀 Day 7: Internal beta test</li>
+</ul>
+<h3 id="week-4-beta-launch-april-2-9">Week 4: Beta Launch (April
+2-9)</h3>
+<ul>
+<li>👥 Day 1-2: Invite 5 beta users (Vietnamese SMEs)</li>
+<li>📈 Day 3-5: Collect feedback + iterate</li>
+<li>🐛 Day 6: Bug fixes + performance</li>
+<li>🎉 Day 7: Public launch prep</li>
+</ul>
+<hr />
+<h2 id="support-troubleshooting">📞 Support &amp; Troubleshooting</h2>
+<h3 id="common-issues">Common Issues</h3>
+<p><strong>1. <code>pnpm install</code> fails</strong></p>
+<div class="sourceCode" id="cb28"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Clear cache</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="at">-rf</span> node_modules</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> pnpm-lock.yaml</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="ex">pnpm</span> install</span></code></pre></div>
+<p><strong>2. Supabase connection error</strong></p>
+<div class="sourceCode" id="cb29"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify .env.local values</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> .env.local <span class="kw">|</span> <span class="fu">grep</span> SUPABASE</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Test connection</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pnpm</span> dev</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Open browser → check console for errors</span></span></code></pre></div>
+<p><strong>3. Git push rejected</strong></p>
+<div class="sourceCode" id="cb30"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Force push (only on pivot branch, NOT main!)</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push origin pivot/business-os <span class="at">--force</span></span></code></pre></div>
+<p><strong>4. Port 3000 already in use</strong></p>
+<div class="sourceCode" id="cb31"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Kill process</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="ex">lsof</span> <span class="at">-ti:3000</span> <span class="kw">|</span> <span class="fu">xargs</span> kill <span class="at">-9</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Or use different port</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="va">PORT</span><span class="op">=</span>3001 <span class="ex">pnpm</span> dev</span></code></pre></div>
+<hr />
+<h2 id="success-criteria">🎯 Success Criteria</h2>
+<p><strong>Setup complete when:</strong> - ✅ VSCode + Claude Code Max
+installed - ✅ Repo cloned, dependencies installed - ✅
+<code>pnpm dev</code> runs without errors - ✅ Can edit files, see live
+reload - ✅ Git push works to <code>pivot/business-os</code> branch - ✅
+Database backup created - ✅ Ready to start building CEO dashboard</p>
+<hr />
+<h2 id="next-steps-after-setup">📚 Next Steps After Setup</h2>
+<p><strong>Immediate (Day 1):</strong> 1. ✅ Complete this setup guide
+2. 📸 Screenshot: VSCode open with repo 3. 🧪 Test: Edit
+<code>app/page.tsx</code>, see live reload 4. 💬 Confirm with Sếp:
+“Setup xong, ready to pivot!”</p>
+<p><strong>Day 2 onwards:</strong> 1. 📋 Design database schema
+(companies, goals, KPIs) 2. 🎨 Wireframe CEO dashboard (Vietnamese UI)
+3. ⚡ Build onboarding wizard (5-min magic) 4. 📦 Create first playbook
+template (COSMATE → E-commerce SaaS)</p>
+<hr />
+<h2 id="need-help">🆘 Need Help?</h2>
+<p><strong>Ask Đệ in Telegram:</strong> - “Bị lỗi X khi setup” - “Cần
+giải thích thêm về Y” - “Hướng khác để làm Z”</p>
+<p><strong>Or spawn tech squad:</strong> - Kiến 🏗️ (Frontend) - UI
+components, React/Next.js - Thép ⚙️ (Backend) - API, database,
+Supabase</p>
+<hr />
+<p><strong>Ready to start? Execute Phase 1 steps now! 🚀</strong></p>
+</body>
+</html>

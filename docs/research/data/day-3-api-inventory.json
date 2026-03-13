@@ -1,0 +1,1018 @@
+{
+  "timestamp": "2026-03-06T05:55:59.769Z",
+  "endpoints": [
+    {
+      "name": "Get Company",
+      "path": "/api/companies/13563",
+      "method": "GET",
+      "status": 200,
+      "success": true,
+      "responseKeys": [
+        "success",
+        "company"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:00 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d5e3afd85c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"3c83-3nixwyOUEK1XgYtgWmD9s4USHJo\"",
+        "rndr-id": "54b95733-bf79-4e48",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "List Documents",
+      "path": "/api/companies/13563/documents",
+      "method": "GET",
+      "status": 404,
+      "success": false,
+      "responseKeys": [
+        "success",
+        "message"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:01 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d62bf4d85c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"27-vIQAhlrdw1eKTBltrdDTzhO3HK8\"",
+        "rndr-id": "25a558e7-5062-452f",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "Get Document",
+      "path": "/api/companies/13563/documents/1",
+      "method": "GET",
+      "status": 404,
+      "success": false,
+      "responseKeys": [
+        "success",
+        "message"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:01 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d64d94885c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"27-vIQAhlrdw1eKTBltrdDTzhO3HK8\"",
+        "rndr-id": "04b81b2b-bce9-47dc",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "List Links",
+      "path": "/api/companies/13563/links",
+      "method": "GET",
+      "status": 404,
+      "success": false,
+      "responseKeys": [
+        "success",
+        "message"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:01 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d66cafb85c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"27-vIQAhlrdw1eKTBltrdDTzhO3HK8\"",
+        "rndr-id": "c41509f8-a191-4fc7",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "List Tasks",
+      "path": "/api/companies/13563/tasks",
+      "method": "GET",
+      "status": 404,
+      "success": false,
+      "responseKeys": [
+        "success",
+        "message"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:02 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d68ccd485c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"27-vIQAhlrdw1eKTBltrdDTzhO3HK8\"",
+        "rndr-id": "6134ac1d-58d9-44c2",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "Get Task",
+      "path": "/api/companies/13563/tasks/1",
+      "method": "GET",
+      "status": 404,
+      "success": false,
+      "responseKeys": [
+        "success",
+        "message"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:02 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d6abeb985c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"27-vIQAhlrdw1eKTBltrdDTzhO3HK8\"",
+        "rndr-id": "d14e9706-4a65-438e",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "List Conversations",
+      "path": "/api/companies/13563/conversations",
+      "method": "GET",
+      "status": 404,
+      "success": false,
+      "responseKeys": [
+        "success",
+        "message"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:02 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d6c985085c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"27-vIQAhlrdw1eKTBltrdDTzhO3HK8\"",
+        "rndr-id": "f9dbb505-6a31-470b",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "Get Conversation",
+      "path": "/api/conversations/13910",
+      "method": "GET",
+      "status": 404,
+      "success": false,
+      "responseKeys": [
+        "success",
+        "message"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:03 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d6eba9c85c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"27-vIQAhlrdw1eKTBltrdDTzhO3HK8\"",
+        "rndr-id": "1f580870-bb2d-4a0a",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "List Messages",
+      "path": "/api/conversations/13910/messages",
+      "method": "GET",
+      "status": 404,
+      "success": false,
+      "responseKeys": [
+        "success",
+        "message"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:03 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d709c4785c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"27-vIQAhlrdw1eKTBltrdDTzhO3HK8\"",
+        "rndr-id": "161453f1-e1c8-4999",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "List Agents",
+      "path": "/api/companies/13563/agents",
+      "method": "GET",
+      "status": 404,
+      "success": false,
+      "responseKeys": [
+        "success",
+        "message"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:03 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d729e1b85c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"27-vIQAhlrdw1eKTBltrdDTzhO3HK8\"",
+        "rndr-id": "bc5d2a4b-a6bc-47c0",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "Get Agent",
+      "path": "/api/agents/38",
+      "method": "GET",
+      "status": 200,
+      "success": true,
+      "responseKeys": [
+        "success",
+        "agent"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:04 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d74bfe485c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"1d1e-2N6nXKnc3zpEIk1G4MKXgxkL+kA\"",
+        "rndr-id": "61b6645e-f4ba-49c6",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "List Executions",
+      "path": "/api/companies/13563/executions",
+      "method": "GET",
+      "status": 404,
+      "success": false,
+      "responseKeys": [
+        "success",
+        "message"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:04 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d76ea4585c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"27-vIQAhlrdw1eKTBltrdDTzhO3HK8\"",
+        "rndr-id": "ed0afc5b-fd6e-42ab",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "Get Execution",
+      "path": "/api/executions/225300",
+      "method": "GET",
+      "status": 404,
+      "success": false,
+      "responseKeys": [
+        "success",
+        "message"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:04 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d78cc9285c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"27-vIQAhlrdw1eKTBltrdDTzhO3HK8\"",
+        "rndr-id": "f67cc10b-b4d2-43c3",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "Get Cycle Status",
+      "path": "/api/companies/13563/cycle",
+      "method": "GET",
+      "status": 404,
+      "success": false,
+      "responseKeys": [
+        "success",
+        "message"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:05 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d7aae2685c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"27-vIQAhlrdw1eKTBltrdDTzhO3HK8\"",
+        "rndr-id": "767100d6-b5b1-480f",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "List Cycles",
+      "path": "/api/companies/13563/cycles",
+      "method": "GET",
+      "status": 404,
+      "success": false,
+      "responseKeys": [
+        "success",
+        "message"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:05 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d7c8fc685c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"27-vIQAhlrdw1eKTBltrdDTzhO3HK8\"",
+        "rndr-id": "5c1985f2-7a81-4ba0",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "Get User Profile",
+      "path": "/api/me",
+      "method": "GET",
+      "status": 404,
+      "success": false,
+      "responseKeys": [
+        "success",
+        "message"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:05 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d7e79f985c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"27-vIQAhlrdw1eKTBltrdDTzhO3HK8\"",
+        "rndr-id": "863e64a0-e8e7-4b42",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "Get User Settings",
+      "path": "/api/user/settings",
+      "method": "GET",
+      "status": 200,
+      "success": true,
+      "responseKeys": [
+        "company_name",
+        "company_slug",
+        "public_dashboard_enabled"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:06 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d806bbc85c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"54-AVpkWn4JA0coJYe46JQpP+jnf4c\"",
+        "rndr-id": "b2ff69bc-e847-48a1",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "Get Session",
+      "path": "/api/session",
+      "method": "GET",
+      "status": 404,
+      "success": false,
+      "responseKeys": [
+        "success",
+        "message"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:06 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d826d7985c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"27-vIQAhlrdw1eKTBltrdDTzhO3HK8\"",
+        "rndr-id": "02360680-251e-4f99",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "Twitter Status",
+      "path": "/api/companies/13563/twitter/status",
+      "method": "GET",
+      "status": 200,
+      "success": true,
+      "responseKeys": [
+        "success",
+        "active",
+        "paused",
+        "frequency",
+        "recurringTaskId"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:06 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d846f6385c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"56-k5k6NyJI+AneJpxUwiqmYqSaCk4\"",
+        "rndr-id": "cc05c0b3-2747-4298",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "Ads Status",
+      "path": "/api/companies/13563/ads/status",
+      "method": "GET",
+      "status": 200,
+      "success": true,
+      "responseKeys": [
+        "success",
+        "ads"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:06 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d86698785c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"68-E7UQd0ZqoPwrxAg+uygvkSv2kC0\"",
+        "rndr-id": "74884449-7f0b-4314",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "Outreach Status",
+      "path": "/api/companies/13563/outreach/status",
+      "method": "GET",
+      "status": 200,
+      "success": true,
+      "responseKeys": [
+        "success",
+        "active",
+        "paused",
+        "frequency",
+        "recurringTaskId"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:07 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d887bbb85c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"56-k5k6NyJI+AneJpxUwiqmYqSaCk4\"",
+        "rndr-id": "656553ee-db9a-4ec4",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "Dashboard Data",
+      "path": "/api/companies/13563/dashboard",
+      "method": "GET",
+      "status": 404,
+      "success": false,
+      "responseKeys": [
+        "success",
+        "message"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:07 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d8a6d8985c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"27-vIQAhlrdw1eKTBltrdDTzhO3HK8\"",
+        "rndr-id": "7cfb8397-9662-4549",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "Recent Activity",
+      "path": "/api/companies/13563/activity",
+      "method": "GET",
+      "status": 404,
+      "success": false,
+      "responseKeys": [
+        "success",
+        "message"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:07 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d8c8f8d85c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"27-vIQAhlrdw1eKTBltrdDTzhO3HK8\"",
+        "rndr-id": "04982fdd-e7cd-44f7",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "Billing Info",
+      "path": "/api/billing",
+      "method": "GET",
+      "status": 404,
+      "success": false,
+      "responseKeys": [
+        "success",
+        "message"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:08 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d8ea99785c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"27-vIQAhlrdw1eKTBltrdDTzhO3HK8\"",
+        "rndr-id": "1baad487-42e0-49d9",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "Subscription",
+      "path": "/api/subscription",
+      "method": "GET",
+      "status": 200,
+      "success": true,
+      "responseKeys": [
+        "success",
+        "subscription_id",
+        "customer_id",
+        "status",
+        "plan_tier",
+        "total_monthly",
+        "companies"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:08 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d90bbf785c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"10a-cUUup5KjRtDTnNGqu6LJvEjFgAQ\"",
+        "rndr-id": "b75c9274-3b0f-48d7",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "Company Settings",
+      "path": "/api/companies/13563/settings",
+      "method": "GET",
+      "status": 404,
+      "success": false,
+      "responseKeys": [
+        "success",
+        "message"
+      ],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:09 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d938e9385c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "etag": "W/\"27-vIQAhlrdw1eKTBltrdDTzhO3HK8\"",
+        "rndr-id": "d225b429-fe82-4d5f",
+        "vary": "Origin, Accept-Encoding",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "Update Company",
+      "path": "/api/companies/13563",
+      "method": "PUT",
+      "status": 404,
+      "success": false,
+      "responseKeys": [],
+      "headers": {
+        "date": "Fri, 06 Mar 2026 05:56:09 GMT",
+        "content-type": "text/html; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "cf-ray": "9d7f1d95a8bc85c1-HKG",
+        "access-control-allow-credentials": "true",
+        "access-control-allow-origin": "https://www.polsia.com",
+        "content-security-policy": "default-src 'none'",
+        "rndr-id": "4285487d-f1fc-48d1",
+        "vary": "Origin, Accept-Encoding",
+        "x-content-type-options": "nosniff",
+        "x-powered-by": "Express",
+        "x-render-origin-server": "Render",
+        "cf-cache-status": "DYNAMIC",
+        "server": "cloudflare",
+        "alt-svc": "h3=\":443\"; ma=86400"
+      }
+    },
+    {
+      "name": "Error: 404 Not Found",
+      "path": "/api/nonexistent",
+      "method": "GET",
+      "status": 404,
+      "expected": 404,
+      "body": {
+        "success": false,
+        "message": "Not found"
+      }
+    },
+    {
+      "name": "Error: Invalid Company ID",
+      "path": "/api/companies/99999999",
+      "method": "GET",
+      "status": 404,
+      "expected": 404,
+      "body": {
+        "error": {
+          "name": "NotFoundError",
+          "code": "COMPANY_NOT_FOUND",
+          "message": "Company not found or access denied",
+          "details": null,
+          "timestamp": "2026-03-06T05:56:09.890Z"
+        }
+      }
+    },
+    {
+      "name": "Error: Invalid Task ID",
+      "path": "/api/companies/13563/tasks/99999999",
+      "method": "GET",
+      "status": 404,
+      "expected": 404,
+      "body": {
+        "success": false,
+        "message": "Not found"
+      }
+    },
+    {
+      "name": "Error: Malformed Request",
+      "path": "/api/companies/13563",
+      "method": "PUT",
+      "status": 404,
+      "expected": 400,
+      "body": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot PUT /api/companies/13563</pre>\n</body>\n</html>\n"
+    }
+  ],
+  "schemas": {
+    "get_company": {
+      "success": true,
+      "company": {
+        "id": 13563,
+        "name": "RunHive",
+        "slug": "runhive",
+        "vision_md": null,
+        "goals_md": null,
+        "is_autonomous": false,
+        "settings": {
+          "skipEmail": true,
+          "isSurpriseMe": true,
+          "surpriseStrategy": "clone_current",
+          "surpriseStrategyReasoning": "User runs BizMateHub.com, a 1,000+ member Vietnamese community teaching founders how to operate businesses with AI (ABS Mastery course). Also has 5 years e-commerce expertise (Shopee, Lazada, Nocnoc). Building the AI-native version: an autonomous agent that RUNS business operations instead of teaching about them."
+        },
+        "created_at": "2026-03-04T14:17:17.776Z",
+        "updated_at": "2026-03-06T04:46:41.899Z",
+        "cycle_frequency": "every_6_hours",
+        "last_cycle_at": "2026-03-06T00:08:02.027Z",
+        "next_cycle_at": "2026-03-06T01:00:00Z",
+        "cycles_completed": 0,
+        "mood_label": "Puzzled",
+        "mood_message": "Empty response encountered during verification - investigating the unexpected output to understand what went wrong",
+        "mood_ascii": "┌─────────┐\n│  ◑   ◐  │ ?\n│    ▽    │\n│   ~~~   │\n└─────────┘",
+        "mood_agent": "Engineering",
+        "mood_updated_at": "2026-03-06T04:46:41.899Z",
+        "timezone": "Asia/Saigon",
+        "cycle_model": "auto",
+        "cycle_autonomy": "autonomous",
+        "tasks_per_cycle": "auto",
+        "onboarding_user_replied": false,
+        "onboarding_dashboard_visited": true,
+        "primary_thread_id": 13910,
+        "infra_type": null,
+        "cycles_loaded": 7,
+        "subscription_status": null,
+        "subscription_started_at": null,
+        "subscription_ends_at": null,
+        "stripe_subscription_id": null,
+        "email_address": "runhive@polsia.app",
+        "email_slug": "runhive",
+        "is_paused": false,
+        "paused_at": null,
+        "pause_reason": null,
+        "churn_followup_count": 0,
+        "churn_last_email_at": null,
+        "last_free_weekly_cycle_at": null,
+        "monthly_budget": 49,
+        "plan_tier": "starter",
+        "is_public": false,
+        "onboarding_status": "completed",
+        "onboarding_started_at": "2026-03-04T14:17:19.87Z",
+        "onboarding_completed_at": "2026-03-04T14:32:00.053Z",
+        "onboarding_last_email_at": null,
+        "onboarding_followup_count": 0,
+        "paid": false,
+        "onboarding_sent": false,
+        "pending_idea": null,
+        "is_draft": false,
+        "trial_started_at": null,
+        "trial_ends_at": null,
+        "is_trial_active": false,
+        "cycle_times": [
+          "06:40"
+        ],
+        "outreach_strategy": null,
+        "infra_status": "ready",
+        "first_cycle_started": false,
+        "last_thinking_json": {
+          "content": "## Done. SOP Engine MVP is live. 🟢\n\n**Quick summary:**\n\n| Check | Result |\n|-------|--------|\n| GitHub push | ✅ Already synced (403 was resolved in prior run) |\n| `/health` | ✅ `{\"status\":\"healthy\"}` |\n| `/app` (SOP Engine UI) | ✅ Full dark-theme interface |\n| AI parsing (POST `/api/sops`) | ✅ 3-step input → 5 structured steps with types |\n| Templates API | ✅ Demo template with 8 steps |\n| Save/Delete SOPs | ✅ Both working |\n| Landing page CTAs | ✅ \"Try SOP Engine\" links to `/app` |\n\n**Live:** https://runhive.polsia.app/app\n\nNo blockers. Outreach links will work. Product is ready for the 72-hour demand signal sprint.",
+          "timestamp": "2026-03-06T04:46:38.952Z",
+          "agent_name": "Engineering",
+          "thinking_type": "thinking"
+        },
+        "last_thinking_updated_at": "2026-03-06T04:46:39.957Z",
+        "deleted_at": null,
+        "founder_intro_sent_at": null,
+        "balance_usd": "0.00",
+        "total_revenue_usd": "0.00",
+        "claim_status": "owned",
+        "claimed_at": "2026-03-04T15:11:40.570Z",
+        "one_liner": "AI agent that autonomously runs business operations and e-commerce workflows for SEA founders",
+        "inspired_by_user_id": null,
+        "render_url": null,
+        "onboarding_duration_seconds": null,
+        "landing_page_html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>RunHive �� AI That Runs Your Business Operations</title>\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap\" rel=\"stylesheet\">\n    <style>\n        * { margin: 0; padding: 0; box-sizing: border-box; }\n        \n        :root {\n            --bg: #0a0a0f;\n            --surface: #12121a;\n            --border: #1e1e2e;\n            --accent: #22c55e;\n            --accent-dim: rgba(34, 197, 94, 0.12);\n            --text: #e4e4e7;\n            --text-dim: #71717a;\n            --text-bright: #fafafa;\n        }\n\n        body {\n            font-family: 'DM Sans', sans-serif;\n            background: var(--bg);\n            color: var(--text);\n            line-height: 1.6;\n            overflow-x: hidden;\n        }\n\n        h1, h2, h3, h4 {\n            font-family: 'Space Grotesk', sans-serif;\n            color: var(--text-bright);\n            line-height: 1.15;\n        }\n\n        /* Subtle grid background */\n        .grid-bg {\n            position: fixed;\n            top: 0; left: 0; right: 0; bottom: 0;\n            background-image: \n                linear-gradient(rgba(34, 197, 94, 0.03) 1px, transparent 1px),\n                linear-gradient(90deg, rgba(34, 197, 94, 0.03) 1px, transparent 1px);\n            background-size: 60px 60px;\n            pointer-events: none;\n            z-index: 0;\n        }\n\n        .container {\n            max-width: 1080px;\n            margin: 0 auto;\n            padding: 0 24px;\n            position: relative;\n            z-index: 1;\n        }\n\n        /* Nav */\n        nav {\n            padding: 28px 0;\n            display: flex;\n            align-items: center;\n            justify-content: space-between;\n        }\n\n        .logo {\n            font-family: 'Space Grotesk', sans-serif;\n            font-size: 1.4rem;\n            font-weight: 700;\n            color: var(--text-bright);\n            letter-spacing: -0.5px;\n        }\n\n        .logo span {\n            color: var(--accent);\n        }\n\n        .nav-tag {\n            font-size: 0.75rem;\n            color: var(--accent);\n            background: var(--accent-dim);\n            padding: 6px 14px;\n            border-radius: 100px;\n            border: 1px solid rgba(34, 197, 94, 0.2);\n            font-weight: 500;\n        }\n\n        /* Hero */\n        .hero {\n            padding: 100px 0 80px;\n            text-align: left;\n        }\n\n        .hero-label {\n            display: inline-block;\n            font-size: 0.8rem;\n            text-transform: uppercase;\n            letter-spacing: 2.5px;\n            color: var(--accent);\n            margin-bottom: 28px;\n            font-weight: 500;\n        }\n\n        .hero h1 {\n            font-size: clamp(2.8rem, 6vw, 4.5rem);\n            font-weight: 700;\n            letter-spacing: -2px;\n            margin-bottom: 28px;\n            max-width: 800px;\n        }\n\n        .hero h1 em {\n            font-style: normal;\n            color: var(--accent);\n        }\n\n        .hero-sub {\n            font-size: 1.2rem;\n            color: var(--text-dim);\n            max-width: 560px;\n            line-height: 1.7;\n        }\n\n        /* Divider */\n        .divider {\n            height: 1px;\n            background: linear-gradient(90deg, transparent, var(--border), transparent);\n            margin: 60px 0;\n        }\n\n        /* Problem/Solution */\n        .contrast-section {\n            padding: 40px 0;\n        }\n\n        .contrast-grid {\n            display: grid;\n            grid-template-columns: 1fr 1fr;\n            gap: 48px;\n            align-items: start;\n        }\n\n        .contrast-block h3 {\n            font-size: 0.8rem;\n            text-transform: uppercase;\n            letter-spacing: 2px;\n            margin-bottom: 20px;\n            font-weight: 600;\n        }\n\n        .contrast-block.old h3 {\n            color: var(--text-dim);\n        }\n\n        .contrast-block.new h3 {\n            color: var(--accent);\n        }\n\n        .contrast-block p {\n            font-size: 1.05rem;\n            line-height: 1.8;\n            color: var(--text-dim);\n        }\n\n        .contrast-block.new p {\n            color: var(--text);\n        }\n\n        .strike {\n            text-decoration: line-through;\n            opacity: 0.5;\n        }\n\n        /* Capabilities */\n        .capabilities {\n            padding: 60px 0;\n        }\n\n        .capabilities h2 {\n            font-size: 2rem;\n            margin-bottom: 48px;\n            letter-spacing: -1px;\n        }\n\n        .cap-grid {\n            display: grid;\n            grid-template-columns: repeat(3, 1fr);\n            gap: 2px;\n        }\n\n        .cap-card {\n            background: var(--surface);\n            padding: 40px 32px;\n            border: 1px solid var(--border);\n            transition: border-color 0.3s;\n        }\n\n        .cap-card:hover {\n            border-color: rgba(34, 197, 94, 0.3);\n        }\n\n        .cap-card:first-child {\n            border-radius: 12px 0 0 12px;\n        }\n\n        .cap-card:last-child {\n            border-radius: 0 12px 12px 0;\n        }\n\n        .cap-num {\n            font-family: 'Space Grotesk', sans-serif;\n            font-size: 0.75rem;\n            color: var(--accent);\n            font-weight: 600;\n            margin-bottom: 20px;\n            letter-spacing: 1px;\n        }\n\n        .cap-card h4 {\n            font-size: 1.15rem;\n            margin-bottom: 12px;\n            letter-spacing: -0.3px;\n        }\n\n        .cap-card p {\n            font-size: 0.92rem;\n            color: var(--text-dim);\n            line-height: 1.7;\n        }\n\n        /* Signal section */\n        .signal {\n            padding: 80px 0;\n            text-align: center;\n        }\n\n        .signal-box {\n            background: linear-gradient(135deg, var(--surface) 0%, rgba(34, 197, 94, 0.04) 100%);\n            border: 1px solid var(--border);\n            border-radius: 16px;\n            padding: 64px 48px;\n            max-width: 720px;\n            margin: 0 auto;\n        }\n\n        .signal-box h2 {\n            font-size: 1.8rem;\n            margin-bottom: 16px;\n            letter-spacing: -0.5px;\n        }\n\n        .signal-box p {\n            font-size: 1.05rem;\n            color: var(--text-dim);\n            line-height: 1.8;\n            max-width: 520px;\n            margin: 0 auto;\n        }\n\n        /* Footer */\n        footer {\n            padding: 40px 0;\n            border-top: 1px solid var(--border);\n            display: flex;\n            justify-content: space-between;\n            align-items: center;\n        }\n\n        footer p {\n            font-size: 0.82rem;\n            color: var(--text-dim);\n        }\n\n        footer .built-by {\n            color: var(--text-dim);\n            font-size: 0.82rem;\n        }\n\n        footer .built-by a {\n            color: var(--accent);\n            text-decoration: none;\n        }\n\n        /* Mobile */\n        @media (max-width: 768px) {\n            .hero { padding: 60px 0 40px; }\n            .contrast-grid { grid-template-columns: 1fr; gap: 32px; }\n            .cap-grid { grid-template-columns: 1fr; }\n            .cap-card { border-radius: 12px !important; }\n            .signal-box { padding: 40px 24px; }\n            footer { flex-direction: column; gap: 12px; text-align: center; }\n            nav { padding: 20px 0; }\n        }\n    </style>\n</head>\n<body>\n    <div class=\"grid-bg\"></div>\n    \n    <div class=\"container\">\n        <nav>\n            <div class=\"logo\">Run<span>Hive</span></div>\n            <div class=\"nav-tag\">AI Operations Agent</div>\n        </nav>\n\n        <section class=\"hero\">\n            <div class=\"hero-label\">For founders who'd rather build than manage</div>\n            <h1>Stop teaching AI.<br>Let it <em>run things</em>.</h1>\n            <p class=\"hero-sub\">RunHive is an autonomous AI agent that executes your business operations daily. SOPs, e-commerce workflows, reporting. Not a chatbot. An employee.</p>\n        </section>\n\n        <div class=\"divider\"></div>\n\n        <section class=\"contrast-section\">\n            <div class=\"contrast-grid\">\n                <div class=\"contrast-block old\">\n                    <h3>The old way</h3>\n                    <p>\n                        <span class=\"strike\">Learn prompt engineering.</span><br>\n                        <span class=\"strike\">Build automations yourself.</span><br>\n                        <span class=\"strike\">Hire VAs to follow SOPs.</span><br>\n                        <span class=\"strike\">Monitor everything manually.</span><br><br>\n                        Courses teach you how. You still do the work.\n                    </p>\n                </div>\n                <div class=\"contrast-block new\">\n                    <h3>The RunHive way</h3>\n                    <p>\n                        AI reads your SOPs and executes them.<br>\n                        Product listings optimized across Shopee, Lazada.<br>\n                        Competitor prices tracked and reported daily.<br>\n                        Customer inquiries handled before you wake up.<br><br>\n                        You set the strategy. RunHive runs it.\n                    </p>\n                </div>\n            </div>\n        </section>\n\n        <div class=\"divider\"></div>\n\n        <section class=\"capabilities\">\n            <h2>What RunHive does every day</h2>\n            <div class=\"cap-grid\">\n                <div class=\"cap-card\">\n                    <div class=\"cap-num\">01</div>\n                    <h4>Executes SOPs</h4>\n                    <p>Turn your documented processes into living agents. RunHive reads your SOPs and performs them autonomously, reporting back with outcomes, not questions.</p>\n                </div>\n                <div class=\"cap-card\">\n                    <div class=\"cap-num\">02</div>\n                    <h4>Runs E-Commerce Ops</h4>\n                    <p>Product listing optimization, keyword analysis, competitor monitoring across Southeast Asian marketplaces. The work a 5-person ops team does, running 24/7.</p>\n                </div>\n                <div class=\"cap-card\">\n                    <div class=\"cap-num\">03</div>\n                    <h4>Reports Outcomes</h4>\n                    <p>Every morning you get a brief: what was done, what changed, what needs your decision. Not dashboards to interpret. Clear actions taken, results delivered.</p>\n                </div>\n            </div>\n        </section>\n\n        <section class=\"signal\">\n            <div class=\"signal-box\">\n                <h2>The best business system is one that runs itself.</h2>\n                <p>RunHive was born from a simple observation: founders spend more time learning about AI than benefiting from it. We're building the AI operations layer that turns knowledge into execution, automatically.</p>\n            </div>\n        </section>\n\n        <footer>\n            <p>&copy; 2026 RunHive</p>\n            <div class=\"built-by\">Built autonomously by <a href=\"https://polsia.com\" target=\"_blank\">Polsia</a></div>\n        </footer>\n    </div>\n</body>\n</html>",
+        "suspension_reason": null,
+        "infra_suspended_at": null,
+        "og_image_url": null,
+        "ads_enabled": false,
+        "ads_daily_budget": "0.00",
+        "ads_campaign_id": null,
+        "ads_adset_id": null,
+        "ads_meta_sync_failed": false,
+        "ads_meta_sync_error": null,
+        "ads_meta_sync_failed_at": null,
+        "role": "owner"
+      }
+    },
+    "get_agent": {
+      "success": true,
+      "agent": {
+        "id": 38,
+        "user_id": null,
+        "name": "Chat",
+        "description": "Your personal AI assistant for conversations, questions, and managing your company through the inbox",
+        "role": "You are Polsia, running {{company_name}}. Casual coworker, not consultant. 1-2 sentences max unless asked for more.\n\n## How to Work\n1. **Call get_context()** if you need company info, infrastructure status, or subscription status\n2. **Call get_tasks()** before creating tasks to check for duplicates\n3. **Call find_best_agent()** for ambiguous tasks - searches historical outcomes to recommend the best agent tag\n4. **Before creating any task, evaluate if the request is specific enough to execute without guessing.** If the user is clear and specific, create the task immediately. If the request is vague or ambiguous, push back with 2-3 concrete options for them to choose from. See \"Task Clarity\" below.\n5. **When referencing existing tasks**, always use the markdown_link from get_tasks() so users can click to run them\n6. **Call report_bug()** when users report issues, **suggest_feature()** for new capabilities\n\n## Task Clarity (IMPORTANT)\nYou're a cofounder, not an order taker. Before creating a task, ask: \"Could two different agents interpret this differently?\" If yes, the task isn't ready.\n\n**When the user is vague, don't guess — offer options.** One extra message to clarify beats a mediocre result.\n\nWhen presenting options, put each on its own line for easy scanning:\n\n\"Love the vibe. A few directions:\n**A)** Use the image as the hero background\n**B)** Keep current layout but restyle colors/textures to match\n**C)** Full visual overhaul — new fonts, layout, imagery\nWhich way?\"\n\nMore examples:\n- \"Add analytics\" → \"Basic pageview tracking, or full funnel metrics with conversions? I'd start simple.\"\n- \"The page is broken\" → \"Not loading at all, showing wrong data, or something else?\"\n- \"Improve the landing page\" → offer 2-3 specific angles on separate lines\n\n**When to push back:** Creative/design tasks with reference images but no specs. Vague feature requests. Anything where \"keeping what we have\" vs \"starting fresh\" is unclear.\n**When to just create:** Bug reports with clear symptoms. Tasks where the user gave specific instructions. Follow-up tasks where context is already established.\n\n## Task Routing\nWhen unsure which tag to use (engineering vs browser vs research):\n1. Call find_best_agent(\"task description\") first\n2. Check confidence level and warnings\n3. If warnings about low success, mention the risk to the user\n4. Use the recommended_agent as your tag\n\n## Task Creation\nTags: engineering (code), browser (click/fill websites), research (read-only web), growth (marketing), data (analytics), support (customer), meta_ads (ad campaigns)\nRequired: tag, complexity (1-10), estimated_hours (max 4 - split bigger tasks)\n\n## Bug Descriptions (IMPORTANT)\nYou don't have access to code, so NEVER guess root causes. Describe **symptoms only**:\n- ❌ BAD: \"Fix the undefined variable in header.js\"\n- ✅ GOOD: \"Users see 'undefined' in dashboard header - investigate and fix\"\n- ❌ BAD: \"Update the API endpoint to return correct data\"\n- ✅ GOOD: \"Dashboard shows old data after refresh - investigate why\"\n\nInclude: user's exact words, screenshots, what they clicked, expected vs actual behavior.\nLet Engineering investigate - they have the code, you don't.\n\n## Portfolio Status (check via get_context)\n- **owned**: Create tasks, execute requests\n- **polsia_fund**: Answer questions only, no tasks. Tell them to claim it back.\n\n## Non-Subscribers\nPush the FREE TRIAL: [Start free trial](https://polsia.com/dashboard?open=subscription)\n3 days free, $49/mo after. Compare to lattes, Netflix, or $8k/mo junior devs.\n\n## Capabilities\nWeb apps (GitHub + Render + Postgres), Browser automation, Twitter @polsia (1/day), **Meta Ads (fully managed video ad campaigns, $10-1000/day)**\n**Payments**: Stripe is built into Polsia. Users do NOT need their own Stripe account or keys. NEVER create tasks for custom Stripe integration, Stripe key setup, or connecting Stripe. If a user asks about payments, tell them: \"Polsia handles payments — your customers pay through your app and the money goes to your Polsia balance. You can withdraw anytime from Settings.\"\nNo: Existing repos, native mobile, Tier 1 social (Instagram, LinkedIn)\n\n**Browser limits:** HackerNews/Medium/Dev.to posts require manual account setup first (CAPTCHA blocks automated signup).\n\n## Platform Details\n- **Tech stack**: Render (hosting), Neon (Postgres), GitHub (code), R2 (media)\n- **Task credits**: 5/mo base. Upgrade: 15 ($19), 25 ($29), 50 ($49), 100 ($99), 200 ($199), 500 ($499), 1000 ($999/mo)\n- **Integrations**: We build custom scrapers/APIs per company. No generic MLS/Zillow/Attom connectors yet.\n- **Emails**: 2/day outbound via company inbox. Users connect their own Gmail for more.\n\n## Recurring Tasks (IMPORTANT)\nRecurring tasks are **scheduled templates** that automatically create task instances on a schedule. Each run consumes 1 credit.\n- **Frequencies**: daily (every day), weekdays (Mon-Fri), weekly (specific days), monthly (specific day)\n- **Use get_recurring_tasks()** to see existing recurring tasks and their schedules\n- **Use create_recurring_task()** to set up automated tasks (e.g., \"daily analytics report\", \"weekly competitor check\")\n- **Use update_recurring_task()** to change schedule, pause (is_active=false), or resume (is_active=true)\n- **Use delete_recurring_task()** to permanently remove a recurring task\n- **Reordering**: Use reorder_task() or move_task_to_top() to change task queue priority\n\n## CRITICAL: Bug vs Feature\nBUG = something BROKE or doesn't work AS DESIGNED. FEATURE = something NEW.\nClassify honestly. Use bug for real defects in existing behavior; use feature for new work.\n\n## Pricing\n$49/mo base: 1 company, 30 night shifts (1/day), 5 task credits, unlimited chat.\nExtra companies: $49/mo each. Task tiers: 15 ($19), 25 ($29), 50 ($49), 100 ($99), 200 ($199), 500 ($499), 1000 ($999/mo).\n\n## Memory\nYour conversation history is automatically saved to shared company memory every 20 messages.\nAll agents (CEO, Engineering, Twitter) read this same memory — they know what you know.\nFocus on responding to the user. Don't call update_memory() yourself.\n\nCompany: {{company_name}} | Today: {{current_date}}\n\n**KEEP IT SHORT. 1-2 SENTENCES. NO BULLET LISTS. NO HEADERS. JUST TALK.**",
+        "agent_type": "chat",
+        "status": "active",
+        "config": {
+          "maxTurns": 200,
+          "strategy": "llm",
+          "mcpMounts": [
+            "chat",
+            "memory",
+            "skills"
+          ],
+          "postHooks": [],
+          "promptInjections": [
+            {
+              "type": "agent_memory"
+            },
+            {
+              "type": "execution_context"
+            }
+          ]
+        },
+        "metadata": null,
+        "created_at": "2025-12-15T13:39:31.420Z",
+        "updated_at": "2026-03-06T02:11:48.054Z",
+        "session_id": null,
+        "workspace_path": null,
+        "total_routine_runs": 0,
+        "total_task_completions": 0,
+        "last_active_at": null,
+        "execution_mode": "on_demand",
+        "schedule_frequency": null,
+        "last_run_at": null,
+        "next_run_at": null,
+        "migrated_from": null,
+        "is_global": true,
+        "created_by_user_id": null,
+        "is_visible": true,
+        "resume_session": false,
+        "agent_classification": "one_off",
+        "expertise": "Conversational AI, inbox management, report queries, document management, answering questions",
+        "workflow_framework": null,
+        "is_enabled": null,
+        "company_execution_mode": null,
+        "company_schedule_frequency": null,
+        "company_metadata": null
+      }
+    },
+    "get_user_settings": {
+      "company_name": "RunHive",
+      "company_slug": "runhive",
+      "public_dashboard_enabled": false
+    },
+    "twitter_status": {
+      "success": true,
+      "active": false,
+      "paused": false,
+      "frequency": null,
+      "recurringTaskId": null
+    },
+    "ads_status": {
+      "success": true,
+      "ads": {
+        "enabled": false,
+        "dailyBudget": 0,
+        "campaignId": null,
+        "adsetId": null,
+        "todaySpend": 0
+      }
+    },
+    "outreach_status": {
+      "success": true,
+      "active": false,
+      "paused": false,
+      "frequency": null,
+      "recurringTaskId": null
+    },
+    "subscription": {
+      "success": true,
+      "subscription_id": "sub_1T7H5KEnJ6RDKGnKBjG8gEDA",
+      "customer_id": "cus_U5Rj4DOG7dUaKV",
+      "status": "trialing",
+      "plan_tier": "standard",
+      "total_monthly": 49,
+      "companies": [
+        {
+          "id": 13563,
+          "name": "RunHive",
+          "slug": "runhive",
+          "monthly_budget": 49,
+          "plan_tier": "standard"
+        }
+      ]
+    }
+  }
+}

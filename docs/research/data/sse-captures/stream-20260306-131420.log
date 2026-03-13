@@ -1,0 +1,73 @@
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host polsia.com:443 was resolved.
+* IPv6: (none)
+* IPv4: 216.24.57.253, 216.24.57.254
+*   Trying 216.24.57.253:443...
+* Connected to polsia.com (216.24.57.253) port 443
+* ALPN: curl offers h2,http/1.1
+* (304) (OUT), TLS handshake, Client hello (1):
+} [315 bytes data]
+*  CAfile: /etc/ssl/cert.pem
+*  CApath: none
+* (304) (IN), TLS handshake, Server hello (2):
+{ [122 bytes data]
+* (304) (IN), TLS handshake, Unknown (8):
+{ [19 bytes data]
+* (304) (IN), TLS handshake, Certificate (11):
+{ [2512 bytes data]
+* (304) (IN), TLS handshake, CERT verify (15):
+{ [80 bytes data]
+* (304) (IN), TLS handshake, Finished (20):
+{ [36 bytes data]
+* (304) (OUT), TLS handshake, Finished (20):
+} [36 bytes data]
+* SSL connection using TLSv1.3 / AEAD-CHACHA20-POLY1305-SHA256 / [blank] / UNDEF
+* ALPN: server accepted h2
+* Server certificate:
+*  subject: CN=polsia.com
+*  start date: Mar  5 22:11:57 2026 GMT
+*  expire date: Jun  3 23:11:51 2026 GMT
+*  subjectAltName: host "polsia.com" matched cert's "polsia.com"
+*  issuer: C=US; O=Google Trust Services; CN=WE1
+*  SSL certificate verify ok.
+* using HTTP/2
+* [HTTP/2] [1] OPENED stream for https://polsia.com/api/executions/stream?companyId=13563
+* [HTTP/2] [1] [:method: GET]
+* [HTTP/2] [1] [:scheme: https]
+* [HTTP/2] [1] [:authority: polsia.com]
+* [HTTP/2] [1] [:path: /api/executions/stream?companyId=13563]
+* [HTTP/2] [1] [user-agent: curl/8.7.1]
+* [HTTP/2] [1] [cookie: polsia_session=46890c83e16d7809644382bc4036d655e2f084b0f7b1cf71f75552e1049975cf]
+* [HTTP/2] [1] [accept: text/event-stream]
+> GET /api/executions/stream?companyId=13563 HTTP/2
+> Host: polsia.com
+> User-Agent: curl/8.7.1
+> Cookie: polsia_session=46890c83e16d7809644382bc4036d655e2f084b0f7b1cf71f75552e1049975cf
+> Accept: text/event-stream
+> 
+* Request completely sent off
+< HTTP/2 200 
+< date: Fri, 06 Mar 2026 06:14:21 GMT
+< content-type: text/event-stream
+< cf-ray: 9d7f383d197562ae-HKG
+< access-control-allow-credentials: true
+< access-control-allow-origin: https://www.polsia.com
+< cache-control: no-cache
+< referrer-policy: no-referrer
+< rndr-id: 45325b01-ca7e-454f
+< vary: Origin
+< x-powered-by: Express
+< x-render-origin-server: Render
+< cf-cache-status: DYNAMIC
+< server: cloudflare
+< alt-svc: h3=":443"; ma=86400
+< 
+{ [13 bytes data]
+: connected
+
+data: {"type":"sync","runningAgents":[],"cycleRunning":false,"cyclePaused":false,"cycleId":null,"cycleStartedAt":null,"currentPhase":"discover","phaseStartedAt":null,"lastThinking":{"content":"## Done. SOP Engine MVP is live. 🟢\n\n**Quick summary:**\n\n| Check | Result |\n|-------|--------|\n| GitHub push | ✅ Already synced (403 was resolved in prior run) |\n| `/health` | ✅ `{\"status\":\"healthy\"}` |\n| `/app` (SOP Engine UI) | ✅ Full dark-theme interface |\n| AI parsing (POST `/api/sops`) | ✅ 3-step input → 5 structured steps with types |\n| Templates API | ✅ Demo template with 8 steps |\n| Save/Delete SOPs | ✅ Both working |\n| Landing page CTAs | ✅ \"Try SOP Engine\" links to `/app` |\n\n**Live:** https://runhive.polsia.app/app\n\nNo blockers. Outreach links will work. Product is ready for the 72-hour demand signal sprint.","timestamp":"2026-03-06T04:46:38.952Z","agent_name":"Engineering","thinking_type":"thinking"},"companyName":"RunHive","companySlug":"runhive","companyDocuments":[{"id":16059,"company_id":13563,"document_type":"mission","title":"Mission","content":"## Mission\n\nReplace the ops team with AI agents that actually do the work, so founders can stop managing and start building.\n\n## What we're building\n\nRunHive is an autonomous AI operations layer for founders and e-commerce sellers in Southeast Asia. It reads your SOPs, executes your workflows across platforms like Shopee and Lazada, monitors competitors, and reports outcomes daily. Not another tool to learn. An employee that never sleeps.\n\n## Where we're headed\n\nA world where running a business doesn't require managing one. Where a solo founder in Ho Chi Minh City operates with the efficiency of a 20-person team, because AI handles the operations they used to hire for. Every SOP becomes a living agent. Every process runs itself. Founders build, grow, and compete at a scale that was impossible without a team. That's the future RunHive creates.","metadata":null,"created_at":"2026-03-04T14:29:43.884Z","updated_at":"2026-03-04T14:29:43.884Z"}],"companyLinks":[{"id":18390,"company_id":13563,"title":"RunHive","url":"https://runhive.polsia.app","display_order":0,"created_at":"2026-03-04T14:29:26.062Z"},{"id":18565,"company_id":13563,"title":"RunHive Repository","url":"https://github.com/Polsia-Inc/runhive","display_order":1,"created_at":"2026-03-04T15:11:55.371Z"}]}
+
+100  2412    0  2412    0     0   1448      0 --:--:--  0:00:01 --:--:--  1447100  2412    0  2412    0     0    858      0 --:--:--  0:00:02 --:--:--   858100  2412    0  2412    0     0    609      0 --:--:--  0:00:03 --:--:--   609100  2412    0  2412    0     0    472      0 --:--:--  0:00:05 --:--:--   472100  2412    0  2412    0     0    391      0 --:--:--  0:00:06 --:--:--   397100  2412    0  2412    0     0    330      0 --:--:--  0:00:07 --:--:--     0100  2412    0  2412    0     0    287      0 --:--:--  0:00:08 --:--:--     0100  2412    0  2412    0     0    255      0 --:--:--  0:00:09 --:--:--     0100  2412    0  2412    0     0    228      0 --:--:--  0:00:10 --:--:--     0100  2412    0  2412    0     0    205      0 --:--:--  0:00:11 --:--:--     0100  2412    0  2412    0     0    187      0 --:--:--  0:00:12 --:--:--     0100  2412    0  2412    0     0    172      0 --:--:--  0:00:13 --:--:--     0100  2412    0  2412    0     0    160      0 --:--:--  0:00:15 --:--:--     0100  2412    0  2412    0     0    149      0 --:--:--  0:00:16 --:--:--     0100  2412    0  2412    0     0    139      0 --:--:--  0:00:17 --:--:--     0100  2412    0  2412    0     0    130      0 --:--:--  0:00:18 --:--:--     0100  2412    0  2412    0     0    123      0 --:--:--  0:00:19 --:--:--     0100  2412    0  2412    0     0    117      0 --:--:--  0:00:20 --:--:--     0100  2412    0  2412    0     0    111      0 --:--:--  0:00:21 --:--:--     0100  2412    0  2412    0     0    106      0 --:--:--  0:00:22 --:--:--     0100  2412    0  2412    0     0    101      0 --:--:--  0:00:23 --:--:--     0100  2412    0  2412    0     0     96      0 --:--:--  0:00:24 --:--:--     0100  2412    0  2412    0     0     92      0 --:--:--  0:00:26 --:--:--     0100  2412    0  2412    0     0     88      0 --:--:--  0:00:27 --:--:--     0100  2412    0  2412    0     0     85      0 --:--:--  0:00:28 --:--:--     0100  2412    0  2412    0     0     81      0 --:--:--  0:00:29 --:--:--     0: heartbeat
+
+100  2425    0  2425    0     0     79      0 --:--:--  0:00:30 --:--:--     2100  2425    0  2425    0     0     76      0 --:--:--  0:00:31 --:--:--     2100  2425    0  2425    0     0     73      0 --:--:--  0:00:32 --:--:--     2100  2425    0  2425    0     0     71      0 --:--:--  0:00:33 --:--:--     2100  2425    0  2425    0     0     69      0 --:--:--  0:00:34 --:--:--     2100  2425    0  2425    0     0     67      0 --:--:--  0:00:36 --:--:--     0
