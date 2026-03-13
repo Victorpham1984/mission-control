@@ -55,3 +55,34 @@ export const updateGoalSchema = z
   .refine((data) => Object.keys(data).length > 0, {
     message: "At least one field must be provided",
   });
+
+// ============================================================
+// KPIs
+// ============================================================
+
+export const createKpiSchema = z.object({
+  company_id: z.string().uuid({ message: "company_id must be a valid UUID" }),
+  goal_id: z.string().uuid().nullable().default(null),
+  name: z.string().min(1, { message: "name is required" }).max(200),
+  category: z.enum(["acquisition", "activation", "revenue", "operations"], {
+    message: "category must be acquisition, activation, revenue, or operations",
+  }),
+  target_value: z.number().nullable().default(null),
+  unit: z.string().min(1, { message: "unit is required" }),
+  source: z.string().nullable().default(null),
+});
+
+export const updateKpiSchema = z
+  .object({
+    name: z.string().min(1).max(200),
+    category: z.enum(["acquisition", "activation", "revenue", "operations"]),
+    current_value: z.number().min(0),
+    target_value: z.number().nullable(),
+    unit: z.string().min(1),
+    source: z.string().nullable(),
+    goal_id: z.string().uuid().nullable(),
+  })
+  .partial()
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field must be provided",
+  });
