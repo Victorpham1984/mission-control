@@ -1,5 +1,5 @@
--- CommandMate — Complete Database Schema
--- Synced with all migrations as of 2026-03-17
+-- CommandMate + BizMate — Complete Database Schema
+-- Synced with all migrations as of 2026-03-14
 -- Source of truth: supabase/migrations/*.sql
 -- This file is DOCUMENTATION — do NOT run directly. Use migrations.
 
@@ -408,6 +408,63 @@ CREATE TABLE public.mcp_tool_usage (
 -- Materialized view: mcp_tool_stats (aggregated metrics per server/tool)
 
 -- ============================================================
+-- BIZMATE PHASE 1: COMPANIES (1:1 per workspace, soft delete)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.companies (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  industry TEXT,
+  team_size TEXT,
+  icp_segment TEXT DEFAULT 'sme' CHECK (icp_segment IN ('creator', 'sme', 'agency')),
+  currency TEXT DEFAULT 'VND',
+  settings JSONB DEFAULT '{}',
+  deleted_at TIMESTAMPTZ DEFAULT NULL,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(workspace_id)
+);
+-- RLS: workspace_owner_companies, service_role_companies
+-- Index: idx_companies_workspace (workspace_id)
+
+-- ============================================================
+-- BIZMATE PHASE 1: GOALS (business objectives)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.goals (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  target_value DECIMAL NOT NULL,
+  current_value DECIMAL DEFAULT 0,
+  unit TEXT NOT NULL,
+  deadline DATE,
+  status TEXT DEFAULT 'active' CHECK (status IN ('active', 'completed', 'paused')),
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+-- RLS: workspace_owner_goals (via companies, soft-delete aware), service_role_goals
+-- Indexes: idx_goals_company, idx_goals_status
+
+-- ============================================================
+-- BIZMATE PHASE 1: KPIS (key performance indicators)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.kpis (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
+  goal_id UUID REFERENCES public.goals(id) ON DELETE SET NULL,
+  name TEXT NOT NULL,
+  category TEXT NOT NULL CHECK (category IN ('acquisition', 'activation', 'revenue', 'operations')),
+  current_value DECIMAL DEFAULT 0,
+  target_value DECIMAL,
+  unit TEXT NOT NULL,
+  source TEXT,
+  updated_at TIMESTAMPTZ DEFAULT now(),
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+-- RLS: workspace_owner_kpis (via companies, soft-delete aware), service_role_kpis
+-- Indexes: idx_kpis_company, idx_kpis_company_category, idx_kpis_goal (partial)
+
+-- ============================================================
 -- KEY FUNCTIONS
 -- ============================================================
 -- handle_new_user()          — signup → creates profile + workspace
@@ -416,3 +473,4 @@ CREATE TABLE public.mcp_tool_usage (
 -- mark_offline_agents()      — cron: marks agents offline if no heartbeat in 5min
 -- match_documents()          — pgvector: semantic similarity search
 -- refresh_mcp_tool_stats()   — refresh materialized view
+-- bizmate_set_updated_at()   — auto-update updated_at on companies/goals/kpis

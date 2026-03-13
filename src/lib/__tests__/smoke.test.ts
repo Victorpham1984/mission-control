@@ -25,6 +25,9 @@ import type {
   McpServer,
   McpToolUsage,
   WorkspaceMember,
+  Company,
+  Goal,
+  Kpi,
 } from "@/lib/supabase/types";
 
 // ============================================================
@@ -244,7 +247,7 @@ describe("Critical path: register → task → approve", () => {
 // ============================================================
 
 describe("All types are exported and compile", () => {
-  it("exports 21 types matching 21 DB tables", () => {
+  it("exports 24 types matching 24 DB tables", () => {
     // This test passes if the file compiles — each type is imported above
     const typeNames: string[] = [
       "UserProfile",
@@ -268,7 +271,64 @@ describe("All types are exported and compile", () => {
       "WebhookLog",
       "McpServer",
       "McpToolUsage",
+      // BizMate Phase 1
+      "Company",
+      "Goal",
+      "Kpi",
     ];
-    expect(typeNames).toHaveLength(21);
+    expect(typeNames).toHaveLength(24);
+  });
+
+  it("Company has soft delete and icp_segment enum", () => {
+    const company: Company = {
+      id: "uuid",
+      workspace_id: "uuid",
+      name: "Shop Hạnh Phúc",
+      industry: "ecommerce",
+      team_size: "6-20",
+      icp_segment: "sme",
+      currency: "VND",
+      settings: { timezone: "Asia/Ho_Chi_Minh" },
+      deleted_at: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    expect(company.deleted_at).toBeNull();
+    expect(company.icp_segment).toBe("sme");
+  });
+
+  it("Goal has status enum and progress tracking", () => {
+    const goal: Goal = {
+      id: "uuid",
+      company_id: "uuid",
+      title: "Đạt 100 đơn hàng/tháng",
+      target_value: 100,
+      current_value: 42,
+      unit: "orders",
+      deadline: "2026-04-30",
+      status: "active",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    expect(goal.current_value).toBeLessThan(goal.target_value);
+    expect(goal.status).toBe("active");
+  });
+
+  it("Kpi has category enum and optional goal link", () => {
+    const kpi: Kpi = {
+      id: "uuid",
+      company_id: "uuid",
+      goal_id: null,
+      name: "Đơn hàng/tháng",
+      category: "operations",
+      current_value: 0,
+      target_value: 100,
+      unit: "count",
+      source: "calculated",
+      updated_at: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+    };
+    expect(kpi.goal_id).toBeNull();
+    expect(kpi.category).toBe("operations");
   });
 });

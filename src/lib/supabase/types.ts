@@ -1,5 +1,5 @@
-// TypeScript types matching CommandMate DB schema
-// Synced with supabase/migrations as of 2026-03-17
+// TypeScript types matching CommandMate + BizMate DB schema
+// Synced with supabase/migrations as of 2026-03-14
 
 // ============================================================
 // Core entities
@@ -312,5 +312,50 @@ export type McpToolUsage = {
   duration_ms: number;
   status: "success" | "error";
   error_message: string | null;
+  created_at: string;
+};
+
+// ============================================================
+// BizMate — Business OS entities (Phase 1)
+// ============================================================
+
+export type Company = {
+  id: string;
+  workspace_id: string;
+  name: string;
+  industry: string | null;
+  team_size: string | null;
+  icp_segment: "creator" | "sme" | "agency";
+  currency: string;
+  settings: Record<string, unknown>;
+  deleted_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type Goal = {
+  id: string;
+  company_id: string;
+  title: string;
+  target_value: number;
+  current_value: number;
+  unit: string;
+  deadline: string | null;
+  status: "active" | "completed" | "paused";
+  created_at: string;
+  updated_at: string;
+};
+
+export type Kpi = {
+  id: string;
+  company_id: string;
+  goal_id: string | null;
+  name: string;
+  category: "acquisition" | "activation" | "revenue" | "operations";
+  current_value: number;
+  target_value: number | null;
+  unit: string;
+  source: string | null;
+  updated_at: string;
   created_at: string;
 };
