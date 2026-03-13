@@ -144,18 +144,7 @@ CREATE TABLE public.playbooks (
     CHECK (category IN ('ecommerce', 'content', 'b2b', 'operations', 'marketing')),
   author_id UUID REFERENCES public.profiles(id),  -- NULL = system template
   config JSONB NOT NULL DEFAULT '{}',
-  -- config structure:
-  -- {
-  --   "required_skills": ["content-writing", "seo"],
-  --   "default_agents": 2,
-  --   "schedule": "daily",
-  --   "kpi_template": [{"name": "Posts/week", "unit": "count", "target": 5}],
-  --   "steps": [
-  --     {"order": 1, "action": "research", "agent_skill": "research"},
-  --     {"order": 2, "action": "write", "agent_skill": "content-writing"},
-  --     {"order": 3, "action": "review", "requires_approval": true}
-  --   ]
-  -- }
+  -- Config schema finalized (see PlaybookConfig validation below)
   is_public BOOLEAN DEFAULT false,  -- Marketplace visibility
   install_count INTEGER DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT now(),
@@ -165,6 +154,51 @@ CREATE TABLE public.playbooks (
 
 **Indexes:** `category`, `is_public`
 **RLS:** Public read (is_public=true), author CRUD
+
+#### `playbooks.config` — Finalized JSONB Schema
+
+**Structure:**
+```typescript
+// Zod validation (to be implemented in src/lib/validations/playbook.ts)
+import { z } from "zod";
+
+const PlaybookStepSchema = z.object({
+  order:             z.number().int().min(1),                      // REQUIRED: execution order
+  action:            z.string().min(1),                            // REQUIRED: action identifier
+  agent_skill:       z.string().min(1),                            // REQUIRED: maps to agent_skills.name
+  trigger:           z.enum(["schedule", "webhook", "after_step_1", "after_step_2",
+                             "after_step_3", "after_step_4", "after_step_5",
+                             "after_step_6", "after_step_7"]),     // REQUIRED: when to execute
+  requires_approval: z.boolean().default(false),                   // OPTIONAL: queue for CEO review
+  config:            z.record(z.unknown()).default({}),             // OPTIONAL: step-specific overrides
+});
+
+const KpiTemplateSchema = z.object({
+  name:     z.string().min(1),                                     // REQUIRED: KPI display name
+  unit:     z.enum(["count", "VND", "%", "seconds"]),              // REQUIRED: measurement unit
+  category: z.enum(["acquisition", "activation", "revenue", "operations"]), // REQUIRED: matches kpis.category
+  target:   z.number().positive(),                                 // REQUIRED: default target value
+});
+
+const PlaybookConfigSchema = z.object({
+  required_skills:  z.array(z.string().min(1)).min(1),             // REQUIRED: ≥1 skill
+  default_agents:   z.number().int().min(1).max(10).default(2),    // OPTIONAL: agents to spawn (1-10)
+  schedule:         z.string().min(1),                             // REQUIRED: cron expression
+  report_schedule:  z.string().optional(),                         // OPTIONAL: separate cron for reports
+  kpi_template:     z.array(KpiTemplateSchema).default([]),        // OPTIONAL: auto-create KPIs on install
+  steps:            z.array(PlaybookStepSchema).min(1),            // REQUIRED: ≥1 step
+});
+```
+
+**Validation rules:**
+- `required_skills` phải có ít nhất 1 skill, mỗi skill map tới `agent_skills.name`
+- `steps[].order` phải unique trong array, bắt đầu từ 1
+- `steps[].agent_skill` phải nằm trong `required_skills`
+- `steps[].trigger` dạng `after_step_N` → step N phải tồn tại
+- `schedule` phải là cron expression hợp lệ (validate bằng `cron-parser`)
+- `default_agents` max 10 cho MVP (tránh resource abuse)
+
+**Reference implementation:** `docs/planning/bizmate/playbook-shopee-auto-order.md` — full 7-step config example.
 
 ---
 
@@ -354,7 +388,7 @@ Mỗi phase = 1 migration file trong `supabase/migrations/`.
 ## Open Questions
 
 1. [x] ~~`companies` 1:1 với `workspaces`~~ → **Resolved: 1:1 cho MVP.** Multi-company = Phase 4+. UNIQUE constraint confirmed.
-2. [ ] `playbooks.config` structure — cần finalize steps schema (blocked by Blocker 1 in BLOCKERS.md)
+2. [x] ~~`playbooks.config` structure~~ → **Resolved: Zod schema + validation rules finalized.** See PlaybookConfig section above. Reference: `playbook-shopee-auto-order.md`.
 3. [ ] `integrations` — Shopee API access đã confirm chưa? OAuth flow nào? (blocked by Blocker 2 in BLOCKERS.md)
 4. [ ] Billing: track ở `actions.cost` hay tạo bảng `billing_events` riêng?
 5. [x] ~~KPI auto-update~~ → **Resolved: Trigger on actions INSERT (real-time) + materialized view refresh (5min cron).** See section above.
