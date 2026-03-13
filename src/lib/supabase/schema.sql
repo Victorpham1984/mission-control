@@ -1,5 +1,14 @@
--- CommandMate Phase 0 — Database Schema
--- Run this in Supabase SQL Editor
+-- CommandMate — Complete Database Schema
+-- Synced with all migrations as of 2026-03-17
+-- Source of truth: supabase/migrations/*.sql
+-- This file is DOCUMENTATION — do NOT run directly. Use migrations.
+
+-- ============================================================
+-- EXTENSIONS
+-- ============================================================
+-- pgcrypto (API key hashing)
+-- pgvector (semantic search embeddings)
+-- pg_cron (scheduled jobs)
 
 -- ============================================================
 -- PROFILES (extends auth.users)
@@ -10,42 +19,15 @@ CREATE TABLE public.profiles (
   full_name TEXT NOT NULL,
   avatar_url TEXT,
   timezone TEXT NOT NULL DEFAULT 'UTC',
+  telegram_chat_id TEXT,
+  preferred_channel TEXT DEFAULT 'dashboard' CHECK (preferred_channel IN ('dashboard', 'telegram', 'zalo', 'email')),
+  notification_settings JSONB DEFAULT '{"task_completed": true, "task_approval_needed": true, "task_failed": true}',
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can view own profile"
-  ON public.profiles FOR SELECT
-  USING (auth.uid() = id);
-
-CREATE POLICY "Users can update own profile"
-  ON public.profiles FOR UPDATE
-  USING (auth.uid() = id);
-
-CREATE POLICY "Users can insert own profile"
-  ON public.profiles FOR INSERT
-  WITH CHECK (auth.uid() = id);
-
--- Auto-create profile on signup
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-  INSERT INTO public.profiles (id, email, full_name, avatar_url)
-  VALUES (
-    NEW.id,
-    NEW.email,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', split_part(NEW.email, '@', 1)),
-    NEW.raw_user_meta_data->>'avatar_url'
-  );
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+-- RLS: user owns own profile
+-- Trigger: on_auth_user_created → handle_new_user() creates profile + workspace
 
 -- ============================================================
 -- WORKSPACES
@@ -61,32 +43,12 @@ CREATE TABLE public.workspaces (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-ALTER TABLE public.workspaces ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Owner can CRUD own workspaces"
-  ON public.workspaces FOR ALL
-  USING (auth.uid() = owner_id);
-
--- Auto-create default workspace on profile creation
-CREATE OR REPLACE FUNCTION public.handle_new_profile()
-RETURNS TRIGGER AS $$
-BEGIN
-  INSERT INTO public.workspaces (name, slug, owner_id)
-  VALUES (
-    NEW.full_name || '''s Workspace',
-    NEW.id::text,
-    NEW.id
-  );
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-CREATE TRIGGER on_profile_created
-  AFTER INSERT ON public.profiles
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_profile();
+-- RLS: owner can CRUD own workspaces
+-- Trigger: on_workspace_created_api_key → auto-creates API key
+-- Trigger: on_workspace_created_founder → auto-creates founder agent
 
 -- ============================================================
--- WORKSPACE MEMBERS (prepared for Phase 2)
+-- WORKSPACE MEMBERS
 -- ============================================================
 CREATE TABLE public.workspace_members (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -97,20 +59,22 @@ CREATE TABLE public.workspace_members (
   UNIQUE(workspace_id, user_id)
 );
 
-ALTER TABLE public.workspace_members ENABLE ROW LEVEL SECURITY;
+-- ============================================================
+-- WORKSPACE API KEYS
+-- ============================================================
+CREATE TABLE public.workspace_api_keys (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
+  key_hash TEXT NOT NULL,
+  key_prefix TEXT NOT NULL,
+  name TEXT DEFAULT 'Default',
+  created_at TIMESTAMPTZ DEFAULT now(),
+  last_used_at TIMESTAMPTZ,
+  is_active BOOLEAN DEFAULT true
+);
 
-CREATE POLICY "Members can view own memberships"
-  ON public.workspace_members FOR SELECT
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Workspace owners can manage members"
-  ON public.workspace_members FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.workspaces
-      WHERE id = workspace_id AND owner_id = auth.uid()
-    )
-  );
+-- Indexes: workspace_id, key_hash
+-- RLS: workspace owner
 
 -- ============================================================
 -- AGENTS
@@ -119,30 +83,210 @@ CREATE TABLE public.agents (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
-  type TEXT NOT NULL DEFAULT 'custom' CHECK (type IN ('openclaw', 'crewai', 'custom', 'founder')),
+  type TEXT NOT NULL DEFAULT 'custom' CHECK (type IN ('openclaw', 'crewai', 'custom', 'founder', 'ai')),
   description TEXT,
   avatar_url TEXT,
   status TEXT NOT NULL DEFAULT 'offline' CHECK (status IN ('online', 'offline', 'error', 'paused')),
   config JSONB NOT NULL DEFAULT '{}',
   external_id TEXT,
   last_seen_at TIMESTAMPTZ,
+  capacity INTEGER DEFAULT 3,
+  agent_token_hash TEXT,
+  status_message TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-ALTER TABLE public.agents ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Owner can CRUD agents in own workspaces"
-  ON public.agents FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.workspaces
-      WHERE id = workspace_id AND owner_id = auth.uid()
-    )
-  );
+-- RLS: workspace owner CRUD
+-- Realtime enabled
 
 -- ============================================================
--- TASKS
+-- AGENT SKILLS
+-- ============================================================
+CREATE TABLE public.agent_skills (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  agent_id UUID NOT NULL REFERENCES public.agents(id) ON DELETE CASCADE,
+  skill TEXT NOT NULL,
+  proficiency REAL DEFAULT 1.0,
+  UNIQUE(agent_id, skill)
+);
+
+-- Indexes: agent_id, skill
+-- RLS: workspace owner (via agents → workspaces join)
+
+-- ============================================================
+-- AGENT HEARTBEATS
+-- ============================================================
+CREATE TABLE public.agent_heartbeats (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  agent_id UUID NOT NULL REFERENCES public.agents(id) ON DELETE CASCADE,
+  status TEXT NOT NULL,
+  load REAL DEFAULT 0,
+  current_task_id UUID REFERENCES public.task_queue(id),
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Index: (agent_id, created_at DESC)
+-- Realtime enabled
+-- RLS: workspace owner (via agents → workspaces join)
+
+-- ============================================================
+-- AGENT PROFILES (persona & memory)
+-- ============================================================
+CREATE TABLE public.agent_profiles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
+  agent_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  avatar_url TEXT,
+  persona TEXT NOT NULL,
+  style_guide JSONB DEFAULT '{}',
+  expertise_areas TEXT[] DEFAULT '{}',
+  memory_context TEXT[] DEFAULT '{}',
+  performance_stats JSONB DEFAULT '{"total_tasks": 0, "avg_rating": 0, "trend": []}',
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(workspace_id, agent_id)
+);
+
+-- RLS: workspace owner + service_role bypass
+
+-- ============================================================
+-- TASK QUEUE (primary task table — 40+ code references)
+-- ============================================================
+CREATE TABLE public.task_queue (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  description TEXT,
+  type TEXT NOT NULL DEFAULT 'custom',
+  priority TEXT NOT NULL DEFAULT 'normal' CHECK (priority IN ('urgent', 'normal', 'background')),
+  status TEXT NOT NULL DEFAULT 'queued' CHECK (status IN ('queued', 'assigned', 'in-progress', 'pending-approval', 'completed', 'failed', 'failed_permanent', 'cancelled')),
+  required_skills TEXT[] DEFAULT '{}',
+  needs_approval BOOLEAN DEFAULT true,
+
+  assigned_agent_id UUID REFERENCES public.agents(id),
+  claimed_at TIMESTAMPTZ,
+
+  progress_percent INTEGER DEFAULT 0,
+  status_message TEXT,
+
+  output JSONB,
+  error TEXT,
+  duration_ms INTEGER,
+
+  approval_status TEXT CHECK (approval_status IN ('pending', 'approved', 'rejected')),
+  approval_feedback TEXT,
+  approval_rating INTEGER CHECK (approval_rating BETWEEN 1 AND 5),
+  approved_by UUID REFERENCES public.profiles(id),
+  approved_at TIMESTAMPTZ,
+
+  feedback_text TEXT,
+  learned_at TIMESTAMPTZ,
+
+  parent_task_id UUID REFERENCES public.task_queue(id),
+  batch_id UUID,
+  batch_index INTEGER,
+
+  retry_count INTEGER DEFAULT 0,
+  reassignment_count INTEGER DEFAULT 0,
+
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now(),
+  completed_at TIMESTAMPTZ
+);
+
+-- Indexes: workspace_id, status, (priority, created_at), assigned_agent_id, batch_id
+-- Trigger: updated_at auto-update
+-- Realtime enabled
+-- RLS: workspace owner
+
+-- ============================================================
+-- TASK HISTORY
+-- ============================================================
+CREATE TABLE public.task_history (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  task_id UUID NOT NULL REFERENCES public.task_queue(id) ON DELETE CASCADE,
+  event_type TEXT NOT NULL,
+  actor TEXT,
+  details JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Index: (task_id, created_at DESC)
+-- RLS: workspace owner (via task_queue → workspaces join)
+
+-- ============================================================
+-- TASK COMMENTS
+-- ============================================================
+CREATE TABLE public.task_comments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  task_id UUID NOT NULL REFERENCES public.task_queue(id) ON DELETE CASCADE,
+  agent_id UUID NOT NULL REFERENCES public.agents(id) ON DELETE CASCADE,
+  workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Indexes: (task_id, created_at), workspace_id
+-- RLS: workspace owner + service_role bypass
+-- Realtime enabled
+
+-- ============================================================
+-- TASK EVALUATIONS
+-- ============================================================
+CREATE TABLE public.task_evaluations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  task_id UUID NOT NULL REFERENCES public.task_queue(id) ON DELETE CASCADE,
+  workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
+  evaluator TEXT NOT NULL DEFAULT 'claude-opus-4',
+  score INTEGER NOT NULL CHECK (score BETWEEN 1 AND 10),
+  reasoning TEXT NOT NULL,
+  criteria JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(task_id)
+);
+
+-- RLS: service_role only
+
+-- ============================================================
+-- AGENT EXAMPLES (learning from task feedback)
+-- ============================================================
+CREATE TABLE public.agent_examples (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  agent_profile_id UUID NOT NULL REFERENCES public.agent_profiles(id) ON DELETE CASCADE,
+  task_id UUID NOT NULL REFERENCES public.task_queue(id) ON DELETE CASCADE,
+  example_type TEXT NOT NULL CHECK (example_type IN ('positive', 'negative')),
+  task_description TEXT,
+  output_snippet TEXT,
+  rating INTEGER,
+  feedback TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- RLS: service_role only
+
+-- ============================================================
+-- MESSAGES
+-- ============================================================
+CREATE TABLE public.messages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  agent_id UUID NOT NULL REFERENCES public.agents(id) ON DELETE CASCADE,
+  workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
+  direction TEXT NOT NULL CHECK (direction IN ('inbound', 'outbound')),
+  content TEXT NOT NULL,
+  metadata JSONB,
+  is_broadcast BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Realtime enabled
+-- RLS: workspace owner
+
+-- ============================================================
+-- TASKS (legacy — replaced by task_queue for active use)
 -- ============================================================
 CREATE TABLE public.tasks (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -159,110 +303,116 @@ CREATE TABLE public.tasks (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-ALTER TABLE public.tasks ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Owner can CRUD tasks in own workspaces"
-  ON public.tasks FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.workspaces
-      WHERE id = workspace_id AND owner_id = auth.uid()
-    )
-  );
-
 -- ============================================================
--- MESSAGES
+-- WORKSPACE DOCUMENTS (knowledge base)
 -- ============================================================
-CREATE TABLE public.messages (
+CREATE TABLE public.workspace_documents (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  agent_id UUID NOT NULL REFERENCES public.agents(id) ON DELETE CASCADE,
   workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
-  direction TEXT NOT NULL CHECK (direction IN ('inbound', 'outbound')),
+  title TEXT NOT NULL,
+  type TEXT NOT NULL CHECK (type IN ('brand_guideline', 'product_catalog', 'style_guide', 'other')),
   content TEXT NOT NULL,
-  metadata JSONB,
-  is_broadcast BOOLEAN NOT NULL DEFAULT false,
+  file_size_bytes INTEGER,
+  mime_type TEXT,
+  tags TEXT[] DEFAULT '{}',
+  uploaded_by UUID REFERENCES public.profiles(id),
+  embeddings VECTOR(1536),
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Index: HNSW on embeddings for vector similarity search
+-- Function: match_documents(query_embedding, threshold, count, workspace_id, doc_type)
+-- RLS: workspace owner + service_role bypass
+
+-- ============================================================
+-- NOTIFICATION LOG
+-- ============================================================
+CREATE TABLE public.notification_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES public.profiles(id),
+  task_id UUID REFERENCES public.task_queue(id),
+  channel TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'sent', 'failed')),
+  message TEXT,
+  error TEXT,
+  external_id TEXT,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  sent_at TIMESTAMPTZ
+);
+
+-- Indexes: (user_id, created_at DESC), task_id
+
+-- ============================================================
+-- WEBHOOKS
+-- ============================================================
+CREATE TABLE public.webhooks (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
+  url TEXT NOT NULL,
+  secret TEXT,
+  events TEXT[] NOT NULL DEFAULT '{}',
+  is_active BOOLEAN DEFAULT true,
+  description TEXT,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- ============================================================
+-- WEBHOOK LOGS
+-- ============================================================
+CREATE TABLE public.webhook_logs (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  webhook_id UUID NOT NULL REFERENCES public.webhooks(id) ON DELETE CASCADE,
+  event TEXT NOT NULL,
+  payload JSONB,
+  status_code INT,
+  success BOOLEAN DEFAULT false,
+  error TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- ============================================================
+-- MCP SERVERS (see also src/lib/mcp/schema.sql)
+-- ============================================================
+CREATE TABLE public.mcp_servers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  workspace_id UUID NOT NULL REFERENCES public.workspaces(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  description TEXT,
+  transport TEXT NOT NULL DEFAULT 'stdio' CHECK (transport IN ('stdio', 'sse')),
+  command TEXT,
+  args JSONB DEFAULT '[]'::jsonb,
+  env JSONB DEFAULT '{}'::jsonb,
+  url TEXT,
+  enabled BOOLEAN NOT NULL DEFAULT true,
+  timeout INTEGER NOT NULL DEFAULT 30000,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE(workspace_id, name)
+);
+
+-- ============================================================
+-- MCP TOOL USAGE
+-- ============================================================
+CREATE TABLE public.mcp_tool_usage (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  server_id UUID REFERENCES public.mcp_servers(id) ON DELETE SET NULL,
+  tool_name TEXT NOT NULL,
+  duration_ms INTEGER NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('success', 'error')),
+  error_message TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Owner can CRUD messages in own workspaces"
-  ON public.messages FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.workspaces
-      WHERE id = workspace_id AND owner_id = auth.uid()
-    )
-  );
+-- Materialized view: mcp_tool_stats (aggregated metrics per server/tool)
 
 -- ============================================================
--- REALTIME (enable for live updates)
+-- KEY FUNCTIONS
 -- ============================================================
-ALTER TABLE public.tasks REPLICA IDENTITY FULL;
-ALTER TABLE public.messages REPLICA IDENTITY FULL;
-ALTER TABLE public.agents REPLICA IDENTITY FULL;
-
--- ============================================================
--- INDEXES
--- ============================================================
-CREATE INDEX idx_agents_workspace ON public.agents(workspace_id);
-CREATE INDEX idx_tasks_workspace ON public.tasks(workspace_id);
-CREATE INDEX idx_tasks_agent ON public.tasks(agent_id);
-CREATE INDEX idx_tasks_status ON public.tasks(status);
-CREATE INDEX idx_messages_workspace ON public.messages(workspace_id);
-CREATE INDEX idx_messages_agent ON public.messages(agent_id);
-CREATE INDEX idx_workspace_members_workspace ON public.workspace_members(workspace_id);
-CREATE INDEX idx_workspace_members_user ON public.workspace_members(user_id);
-
--- ============================================================
--- UPDATED_AT TRIGGER
--- ============================================================
-CREATE OR REPLACE FUNCTION public.update_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = now();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER update_profiles_updated_at
-  BEFORE UPDATE ON public.profiles
-  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
-
-CREATE TRIGGER update_workspaces_updated_at
-  BEFORE UPDATE ON public.workspaces
-  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
-
-CREATE TRIGGER update_agents_updated_at
-  BEFORE UPDATE ON public.agents
-  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
-
--- ============================================================
--- AUTO-CREATE FOUNDER AGENT ON WORKSPACE CREATION
--- ============================================================
-CREATE OR REPLACE FUNCTION public.handle_new_workspace_founder()
-RETURNS TRIGGER AS $$
-DECLARE
-  owner_profile RECORD;
-BEGIN
-  SELECT full_name, avatar_url FROM public.profiles WHERE id = NEW.owner_id INTO owner_profile;
-
-  INSERT INTO public.agents (workspace_id, name, type, role, about, avatar_emoji, status, config, description)
-  VALUES (
-    NEW.id,
-    COALESCE(owner_profile.full_name, 'Founder'),
-    'founder',
-    'Founder',
-    'Workspace founder & owner',
-    '👑',
-    'online',
-    '{"badge": "founder", "color": "#f59e0b"}'::jsonb,
-    'Auto-created founder agent'
-  );
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-CREATE TRIGGER on_workspace_created_founder
-  AFTER INSERT ON public.workspaces
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_workspace_founder();
+-- handle_new_user()          — signup → creates profile + workspace
+-- handle_new_workspace_founder() — workspace creation → creates founder agent
+-- handle_new_workspace_api_key() — workspace creation → creates API key
+-- mark_offline_agents()      — cron: marks agents offline if no heartbeat in 5min
+-- match_documents()          — pgvector: semantic similarity search
+-- refresh_mcp_tool_stats()   — refresh materialized view
