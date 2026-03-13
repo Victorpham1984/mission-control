@@ -18,10 +18,23 @@ CommandMate = engine (agent API, task pipeline, MCP tools). BizMate = product la
 
 Sprint plan chi tiết: `docs/planning/sprint-plan-v1.md`
 
-**W1 focus:** Fix 13 missing DB tables + CI/CD + BizMate PRD draft
+**W1 progress:**
+- Day 1 ✅: Fix founder trigger + add task_comments + sync schema.sql (21 tables)
+- Day 2 ✅: CI/CD pipeline + types.ts (21 types) + 11 smoke tests
+- Day 3: (skipped — manual test verification)
+- Day 4 ✅: Track B — schema risk mitigation, BLOCKERS.md, wireframe, playbook template
+- Day 5 TODO: PRD v0.1, fix Day 1-3 issues, verify stubs, create `pivot/business-os` branch
+
 **W2 focus:** MCP agent↔tool integration + SSE transport
 **W3 focus:** Telegram notifications + metrics API
 **W4 focus:** Agent creation UI + OutcomeDashboard + polish → MVP ready
+
+### Blockers (Track B — resolve before Week 2)
+
+- **Blocker 1 (P0):** Playbook content — Shopee Auto-Order steps chưa có nội dung. Template: `docs/planning/bizmate/playbook-shopee-auto-order.md`. Owner: Sếp Victor + Đệ. Deadline: 2026-03-20.
+- **Blocker 2 (P0):** Shopee API access — chưa confirm. Fallback: manual CSV mode. Owner: Sếp Victor.
+- **Blocker 3 (P1):** Playbook config schema — blocked by Blocker 1.
+- Details: `docs/planning/bizmate/BLOCKERS.md`
 
 ### Known Issues
 
@@ -142,6 +155,10 @@ Template: `.env.example`
 - `docs/planning/sprint-plan-v1.md` — current sprint plan (W1-W4)
 - `docs/planning/project-audit-2026-03-13.md` — full project audit
 - `docs/planning/bizmate/PRD-draft.md` — BizMate Business OS PRD (Track B)
+- `docs/planning/bizmate/schema-design.md` — BizMate DB schema (7 tables, soft delete, pgcrypto)
+- `docs/planning/bizmate/wireframe-onboarding.md` — 6-step onboarding wizard
+- `docs/planning/bizmate/BLOCKERS.md` — critical blockers + mitigation
+- `docs/planning/bizmate/playbook-shopee-auto-order.md` — Shopee playbook template (WIP)
 
 ### Legacy Strategy (context, not active plans)
 - `docs/commandmate-legacy/STRATEGY-2026.md` — strategic direction
