@@ -23,7 +23,7 @@ Sprint plan chi tiết: `docs/planning/sprint-plan-v1.md`
 - Day 2 ✅: CI/CD pipeline + types.ts (21 types) + 11 smoke tests
 - Day 3: (skipped — manual test verification)
 - Day 4 ✅: Track B — schema risk mitigation, BLOCKERS.md, wireframe, playbook template
-- Day 5 TODO: PRD v0.1, fix Day 1-3 issues, verify stubs, create `pivot/business-os` branch
+- Day 5 ✅: PRD v0.1 (12 sections), API audit (34 routes clean), PRD consistency review, `pivot/business-os` branch
 
 **W2 focus:** MCP agent↔tool integration + SSE transport
 **W3 focus:** Telegram notifications + metrics API
