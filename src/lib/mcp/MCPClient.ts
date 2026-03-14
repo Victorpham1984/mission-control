@@ -1,21 +1,28 @@
 /**
  * MCPClient - Manages a single MCP server connection
  * Features: retry with exponential backoff, circuit breaker, tool caching, enriched errors
+ *
+ * Supported transports:
+ *   stdio — subprocess via stdin/stdout (default)
+ *   sse   — HTTP + Server-Sent Events (remote MCP servers)
  */
 
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
+import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
 import type { MCPServerConfig, MCPTool, MCPToolExecutionResult, CircuitBreakerState } from './types';
 
 const TOOL_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 const CIRCUIT_BREAKER_THRESHOLD = 5;
 const CIRCUIT_BREAKER_RESET_MS = 60 * 1000; // 1 minute
 const DEFAULT_TIMEOUT_MS = 30_000;
+const DEFAULT_SSE_TIMEOUT_MS = 10_000;
 const MAX_RETRIES = 3;
 
 export class MCPClient {
   private client: Client | null = null;
-  private transport: StdioClientTransport | null = null;
+  private transport: Transport | null = null;
   private connected = false;
   private toolCache: MCPTool[] | null = null;
   private toolCacheTime = 0;
@@ -33,27 +40,61 @@ export class MCPClient {
   async connect(): Promise<void> {
     if (this.connected) return;
 
-    if (this.config.transport !== 'stdio') {
-      throw new Error(`Transport "${this.config.transport}" not yet supported`);
-    }
-
-    if (!this.config.command) {
-      throw new Error(`No command specified for server "${this.serverName}"`);
-    }
-
-    this.transport = new StdioClientTransport({
-      command: this.config.command,
-      args: this.config.args ?? [],
-      env: { ...process.env, ...(this.config.env ?? {}) } as Record<string, string>,
-    });
+    this.transport = this.createTransport();
 
     this.client = new Client(
       { name: 'commandmate', version: '1.0.0' },
       { capabilities: {} },
     );
 
-    await this.client.connect(this.transport);
+    // For SSE: wrap connect in a timeout to avoid hanging on unreachable servers
+    if (this.config.transport === 'sse') {
+      const connectTimeout = this.config.timeout || DEFAULT_SSE_TIMEOUT_MS;
+      await Promise.race([
+        this.client.connect(this.transport),
+        new Promise<never>((_, reject) =>
+          setTimeout(
+            () => reject(new Error(`SSE connection timeout after ${connectTimeout}ms for "${this.serverName}"`)),
+            connectTimeout,
+          ),
+        ),
+      ]);
+    } else {
+      await this.client.connect(this.transport);
+    }
+
     this.connected = true;
+  }
+
+  /**
+   * Create the appropriate transport based on config.transport.
+   *
+   *   stdio: spawns a subprocess, communicates via stdin/stdout
+   *   sse:   connects to an HTTP endpoint, receives via Server-Sent Events
+   */
+  private createTransport(): Transport {
+    switch (this.config.transport) {
+      case 'stdio': {
+        if (!this.config.command) {
+          throw new Error(`No command specified for stdio server "${this.serverName}"`);
+        }
+        return new StdioClientTransport({
+          command: this.config.command,
+          args: this.config.args ?? [],
+          env: { ...process.env, ...(this.config.env ?? {}) } as Record<string, string>,
+        });
+      }
+
+      case 'sse': {
+        if (!this.config.url) {
+          throw new Error(`No URL specified for SSE server "${this.serverName}"`);
+        }
+        return new SSEClientTransport(new URL(this.config.url));
+      }
+
+      default:
+        throw new Error(`Unsupported transport "${this.config.transport}" for server "${this.serverName}"`);
+    }
   }
 
   async disconnect(): Promise<void> {
@@ -126,7 +167,7 @@ export class MCPClient {
         if (this.isTransientError(lastError) && attempt < MAX_RETRIES - 1) {
           await this.sleep(Math.pow(2, attempt) * 1000);
           // Try reconnecting for connection errors
-          if (lastError.message.includes('ECONNREFUSED') || !this.connected) {
+          if (this.isConnectionError(lastError)) {
             this.connected = false;
             try { await this.connect(); } catch { /* will fail on next attempt */ }
           }
@@ -151,7 +192,8 @@ export class MCPClient {
     toolName: string,
     params: Record<string, unknown>,
   ) {
-    const timeout = this.config.timeout || DEFAULT_TIMEOUT_MS;
+    const timeout = this.config.timeout ||
+      (this.config.transport === 'sse' ? DEFAULT_SSE_TIMEOUT_MS : DEFAULT_TIMEOUT_MS);
 
     return Promise.race([
       this.client!.callTool({ name: toolName, arguments: params }),
@@ -167,14 +209,23 @@ export class MCPClient {
     }
   }
 
+  private isConnectionError(error: Error): boolean {
+    const msg = error.message.toLowerCase();
+    return (
+      msg.includes('econnrefused') ||
+      msg.includes('econnreset') ||
+      msg.includes('epipe') ||
+      msg.includes('socket hang up') ||
+      msg.includes('sse connection') ||
+      msg.includes('fetch failed')
+    );
+  }
+
   private isTransientError(error: Error): boolean {
     const msg = error.message.toLowerCase();
     return (
       msg.includes('timeout') ||
-      msg.includes('econnrefused') ||
-      msg.includes('econnreset') ||
-      msg.includes('epipe') ||
-      msg.includes('socket hang up')
+      this.isConnectionError(error)
     );
   }
 
