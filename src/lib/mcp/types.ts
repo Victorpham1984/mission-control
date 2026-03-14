@@ -57,3 +57,41 @@ export interface CircuitBreakerState {
   lastFailure: number;
   state: 'closed' | 'open' | 'half-open';
 }
+
+/**
+ * Agent-MCP Integration Types
+ */
+
+export interface AgentToolContext {
+  taskId: string;
+  agentId: string;
+  workspaceId: string;
+}
+
+export interface AvailableTool {
+  serverId: string;
+  serverName: string;
+  name: string;
+  description?: string;
+  inputSchema: Record<string, unknown>;
+}
+
+export interface AgentToolExecutionRequest {
+  serverId: string;
+  toolName: string;
+  arguments: Record<string, unknown>;
+}
+
+export interface AgentToolExecutionResult {
+  success: boolean;
+  content?: Array<{
+    type: string;
+    text?: string;
+    data?: string;
+    mimeType?: string;
+  }>;
+  error?: string;
+  durationMs: number;
+  toolName: string;
+  serverId: string;
+}

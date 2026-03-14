@@ -1,18 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { MCPServerRegistry } from '@/lib/mcp';
 import { MCPMetrics } from '@/lib/mcp/metrics';
+import { getSharedRegistry } from '@/lib/mcp/registry-singleton';
 import type { MCPServerConfig } from '@/lib/mcp/types';
-
-// Singleton registry for the server process
-let registry: MCPServerRegistry | null = null;
-
-function getRegistry(): MCPServerRegistry {
-  if (!registry) {
-    registry = new MCPServerRegistry();
-  }
-  return registry;
-}
 
 export async function GET() {
   const supabase = await createClient();
@@ -28,7 +18,7 @@ export async function GET() {
     return NextResponse.json({ tools: [] });
   }
 
-  const reg = getRegistry();
+  const reg = getSharedRegistry();
   const allTools: Array<{ serverId: string; serverName: string; name: string; description?: string; inputSchema: any }> = [];
 
   for (const server of servers) {
@@ -76,7 +66,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Server not found' }, { status: 404 });
   }
 
-  const reg = getRegistry();
+  const reg = getSharedRegistry();
 
   // Ensure server is registered
   if (!reg.getClient(serverId)) {
