@@ -174,3 +174,35 @@ Template: `.env.example`
 - `docs/MCP_QUICKSTART.md` — 5-minute MCP setup
 - `docs/CLAUDE_DESKTOP_SETUP.md` — Claude Desktop integration
 - `docs/MCP_SETUP_GUIDE.md` — MCP architecture reference
+
+
+## gstack Skills
+
+Use gstack skills from ~/.claude/skills/gstack for specialized workflows.
+Available slash commands:
+
+| Command | Role | When to use |
+|---------|------|-------------|
+| /plan-ceo-review | Founder/CEO | Before coding — rethink the real problem, find "10-star product" |
+| /plan-eng-review | Eng Manager | Lock architecture, data flow, edge cases, test matrix |
+| /review | Staff Engineer (paranoid) | Before commit — find bugs that pass CI but blow up production |
+| /ship | Release Engineer | Sync main, run tests, push branch, open PR |
+| /browse | QA Engineer | Navigate app with "eyes" — click, screenshot, verify flows |
+| /qa | QA Lead | Systematic testing with health scores + regression tracking |
+| /setup-browser-cookies | Session Manager | Import cookies from Chrome/Brave into headless session |
+| /retro | Eng Manager | Team retro from git history — per-person praise + growth areas |
+
+### Recommended workflow per feature
+
+1. `/plan-ceo-review` — rethink problem at founder level
+2. `/plan-eng-review` — lock architecture + test plan
+3. Implement the plan
+4. `/review` — paranoid review before commit
+5. `/ship` — push + open PR
+6. `/qa https://staging-url --quick` — smoke test staging
+
+### Rules
+- For web browsing, always use `/browse` skill, never `mcp__claude-in-chrome__*` tools
+- `/qa` output includes health score (0-100) — flag anything below 80
+- `/review` should catch: race conditions, N+1 queries, trust boundary violations, missing error handling
+
