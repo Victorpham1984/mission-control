@@ -168,12 +168,13 @@ describe('MCPClient', () => {
       expect(client.isConnected()).toBe(false);
     });
 
-    test('returns error for missing transport', async () => {
+    test('returns error for SSE without URL', async () => {
       const config = makeFilesystemConfig(tmpDir, {
-        transport: 'sse' as any,
+        transport: 'sse',
+        url: undefined,
       });
       const client = new MCPClient(config);
-      await expect(client.connect()).rejects.toThrow('not yet supported');
+      await expect(client.connect()).rejects.toThrow('No URL specified');
     });
 
     test('enriches error with server/tool context', async () => {

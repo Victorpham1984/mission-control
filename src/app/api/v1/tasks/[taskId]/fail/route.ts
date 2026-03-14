@@ -3,6 +3,7 @@ import { authenticateRequest, getServiceClient } from "@/lib/api/auth";
 import { apiError, apiSuccess } from "@/lib/api/errors";
 import { logTaskEvent } from "@/lib/api/task-history";
 import { NotificationService } from "@/lib/notifications";
+import { ActionLogger } from "@/lib/playbooks/action-logger";
 import { dispatchWebhookEvent } from "@/lib/webhooks";
 
 // POST /api/v1/tasks/:taskId/fail
@@ -104,6 +105,14 @@ export async function POST(
     error: errorMsg,
     retry_count: newRetryCount,
   });
+
+  // Log action for playbook tasks — both success=false paths (non-blocking)
+  try {
+    const actionLogger = new ActionLogger(supabase);
+    await actionLogger.logFromTask(taskId, auth.workspaceId, {}, false, null, errorMsg);
+  } catch {
+    // Non-blocking
+  }
 
   // Notify on permanent failure
   if (newStatus === "failed_permanent") {

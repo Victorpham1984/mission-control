@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { authenticateRequest, getServiceClient } from "@/lib/api/auth";
 import { apiError, apiSuccess } from "@/lib/api/errors";
 import { NotificationService } from "@/lib/notifications";
+import { ActionLogger } from "@/lib/playbooks/action-logger";
 import { dispatchWebhookEvent } from "@/lib/webhooks";
 
 // POST /api/v1/tasks/:taskId/complete
@@ -85,6 +86,14 @@ export async function POST(
     output: body.output || {},
     duration_ms: durationMs,
   });
+
+  // Log action for playbook tasks (non-blocking)
+  try {
+    const actionLogger = new ActionLogger(supabase);
+    await actionLogger.logFromTask(taskId, auth.workspaceId, body.output || {}, true, durationMs);
+  } catch {
+    // Non-blocking: action logging failure should not fail the complete endpoint
+  }
 
   // Send notification
   let notificationSent = false;

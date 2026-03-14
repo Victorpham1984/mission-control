@@ -92,10 +92,29 @@ Single test file: `npx jest path/to/test.ts --runInBand --forceExit`
 ### MCP Integration
 
 - Servers registered per-workspace in `mcp_servers` table
-- Tool execution: POST `/api/v1/mcp/tools` → MCPServerRegistry → MCPClient (stdio transport)
+- Transports: **stdio** (subprocess, default) and **SSE** (HTTP + Server-Sent Events)
+- Tool execution: POST `/api/v1/mcp/tools` → MCPServerRegistry → MCPClient
+- Agent↔tool: `AgentToolExecutor` (`src/lib/mcp/agent-integration.ts`) — atomic task ownership + tool execution within task context
+- Agent tool API:
+  - GET `/api/v1/tasks/{taskId}/tools` — discover MCP tools for a task
+  - POST `/api/v1/tasks/{taskId}/execute-tool` — execute tool in task context
+- Shared singleton: `getSharedRegistry()` (`src/lib/mcp/registry-singleton.ts`)
 - Circuit breaker: opens after 5 failures/1min; retry: exponential backoff, max 3 attempts
-- Tool cache TTL: 5 minutes; execution timeout: 30 seconds
+- Tool cache TTL: 5 minutes; execution timeout: 30s (stdio), 10s (SSE)
 - Docs: `docs/MCP_QUICKSTART.md`, `docs/CLAUDE_DESKTOP_SETUP.md`
+
+### Playbook Execution
+
+- `PlaybookExecutor` (`src/lib/playbooks/executor.ts`) — reads installed playbook config, spawns tasks
+- Run endpoint: POST `/api/v1/installed-playbooks/{id}/run`
+  - Parses `playbook.config.steps[]`, creates 1 task per step in `task_queue`
+  - Each task gets `PlaybookTaskMetadata`: `playbook_run_id`, `step_order`, `step_action`, etc.
+  - Idempotency: rejects 409 if in-flight tasks exist; two-phase concurrent safety
+- `ActionLogger` (`src/lib/playbooks/action-logger.ts`) — bridges task complete/fail → `actions` table
+  - Wired into `tasks/{id}/complete` and `tasks/{id}/fail` routes (non-blocking)
+  - Logs both success and failure paths; skips non-playbook tasks
+- Notification: task completion triggers `NotificationService` → Telegram (with approval buttons) or Dashboard
+- Demo: `npx tsx scripts/demo-playbook-loop.ts`
 
 ## Coding Conventions
 
@@ -174,3 +193,35 @@ Template: `.env.example`
 - `docs/MCP_QUICKSTART.md` — 5-minute MCP setup
 - `docs/CLAUDE_DESKTOP_SETUP.md` — Claude Desktop integration
 - `docs/MCP_SETUP_GUIDE.md` — MCP architecture reference
+
+
+## gstack Skills
+
+Use gstack skills from ~/.claude/skills/gstack for specialized workflows.
+Available slash commands:
+
+| Command | Role | When to use |
+|---------|------|-------------|
+| /plan-ceo-review | Founder/CEO | Before coding — rethink the real problem, find "10-star product" |
+| /plan-eng-review | Eng Manager | Lock architecture, data flow, edge cases, test matrix |
+| /review | Staff Engineer (paranoid) | Before commit — find bugs that pass CI but blow up production |
+| /ship | Release Engineer | Sync main, run tests, push branch, open PR |
+| /browse | QA Engineer | Navigate app with "eyes" — click, screenshot, verify flows |
+| /qa | QA Lead | Systematic testing with health scores + regression tracking |
+| /setup-browser-cookies | Session Manager | Import cookies from Chrome/Brave into headless session |
+| /retro | Eng Manager | Team retro from git history — per-person praise + growth areas |
+
+### Recommended workflow per feature
+
+1. `/plan-ceo-review` — rethink problem at founder level
+2. `/plan-eng-review` — lock architecture + test plan
+3. Implement the plan
+4. `/review` — paranoid review before commit
+5. `/ship` — push + open PR
+6. `/qa https://staging-url --quick` — smoke test staging
+
+### Rules
+- For web browsing, always use `/browse` skill, never `mcp__claude-in-chrome__*` tools
+- `/qa` output includes health score (0-100) — flag anything below 80
+- `/review` should catch: race conditions, N+1 queries, trust boundary violations, missing error handling
+
