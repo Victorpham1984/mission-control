@@ -5,14 +5,11 @@ import { supabase } from "@/lib/supabase/hooks";
 
 const navItems = [
   { key: "/", label: "Dashboard", emoji: "📊" },
+  { key: "/dashboard/playbooks", label: "Playbooks", emoji: "📦" },
   { key: "/dashboard/approvals", label: "Approvals", emoji: "✅" },
+  { key: "/dashboard/notifications", label: "Notifications", emoji: "🔔" },
   { key: "/agents", label: "Agents", emoji: "🤖" },
-  { key: "/chat/live", label: "Live Chat", emoji: "💬" },
-  { key: "/sessions", label: "Sessions", emoji: "📋" },
   { key: "/cron", label: "Cron", emoji: "⏰" },
-  { key: "/hooks", label: "Hooks", emoji: "🪝" },
-  { key: "/routing", label: "Routing", emoji: "🔀" },
-  { key: "/workspace/documents", label: "Workspace", emoji: "📄" },
   { key: "/settings", label: "Settings", emoji: "⚙️" },
 ];
 
